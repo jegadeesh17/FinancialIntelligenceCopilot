@@ -72,7 +72,7 @@ class TestAppSmoke:
     def test_chat_roundtrip_with_mocked_pipeline(self, monkeypatch):
         from src.schemas import Citation, RAGResponse, RetrievalResult
 
-        def fake_retrieve(_q, top_k=5):  # noqa: ARG001
+        def fake_retrieve(_q, top_k=5, max_distance=None):  # noqa: ARG001
             return [RetrievalResult(source="doc.pdf", page=1, text="Some chunk", chunk_index=0, score=0.1)]
 
         def fake_generate(_q, _contexts):

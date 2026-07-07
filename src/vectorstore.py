@@ -9,6 +9,7 @@ from chromadb.api.models.Collection import Collection
 
 from src.config import Settings, get_settings
 from src.embeddings import embed_texts
+from src.indexing import write_index_metadata
 from src.ingest_docs import ingest_directory
 from src.schemas import DocumentChunk
 
@@ -94,11 +95,15 @@ def build_vector_index(
 ) -> int:
     """Ingest PDFs from disk, embed chunks, and persist to ChromaDB."""
     settings = settings or get_settings()
-    chunks = ingest_directory(directory=pdf_dir, settings=settings)
+    target_dir = pdf_dir or settings.raw_pdf_path
+    chunks = ingest_directory(directory=target_dir, settings=settings)
     client = get_chroma_client(settings=settings)
-    return upsert_chunks(
+    stored = upsert_chunks(
         chunks,
         client=client,
         collection_name=collection_name,
         settings=settings,
     )
+    pdf_count = len(list(Path(target_dir).glob("*.pdf")))
+    write_index_metadata(chunk_count=stored, pdf_count=pdf_count, settings=settings)
+    return stored

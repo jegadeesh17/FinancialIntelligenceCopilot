@@ -108,6 +108,22 @@ class TestRetriever:
         results = retrieve("Any query", settings=settings, persist_dir=chroma_dir)
         assert results == []
 
+    def test_retrieve_applies_max_distance_filter(self, sample_chunks, chroma_dir, settings):
+        from src.retriever import retrieve
+        from src.vectorstore import get_chroma_client, upsert_chunks
+
+        client = get_chroma_client(persist_dir=chroma_dir, settings=settings)
+        upsert_chunks(sample_chunks, client=client, settings=settings)
+        # aggressive threshold should filter all results for most queries
+        results = retrieve(
+            "What does SEBI say about disclosure obligations?",
+            top_k=3,
+            max_distance=0.000001,
+            settings=settings,
+            persist_dir=chroma_dir,
+        )
+        assert results == []
+
 
 @pytest.mark.integration
 class TestRetrieverIntegration:

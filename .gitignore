@@ -12,3 +12,5 @@ models/*
 !models/.keep
 .pytest_cache/
 .chroma/
+logs/*
+!logs/.keep

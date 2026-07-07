@@ -13,6 +13,7 @@ from src.vectorstore import COLLECTION_NAME, get_chroma_client, get_or_create_co
 def retrieve(
     query: str,
     top_k: int | None = None,
+    max_distance: float | None = None,
     settings: Settings | None = None,
     persist_dir: Path | None = None,
     collection_name: str = COLLECTION_NAME,
@@ -42,6 +43,8 @@ def retrieve(
 
     results: list[RetrievalResult] = []
     for text, metadata, distance in zip(documents, metadatas, distances):
+        if max_distance is not None and float(distance) > max_distance:
+            continue
         md = metadata or {}
         results.append(
             RetrievalResult(
