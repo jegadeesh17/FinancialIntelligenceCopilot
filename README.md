@@ -73,7 +73,7 @@ FinancialComplianceRAG/
 | 4 | Retrieval System | ✅ Complete |
 | 5 | LLM Generator | ✅ Complete |
 | 6 | Streamlit Chat UI | ✅ Complete |
-| 7 | Containerization (Docker) | ⬜ Pending |
+| 7 | Containerization (Docker) | ✅ Complete |
 
 Run scaffold test: `pytest tests/test_phase0_scaffold.py -v`  
 Full spec: [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)
@@ -85,6 +85,11 @@ cd FinancialComplianceRAG
 pip install -r requirements.txt
 cp .env.example .env   # add OPENROUTER_API_KEY
 streamlit run app/app.py
+```
+
+```powershell
+# Docker deployment
+docker compose up --build
 ```
 
 ---

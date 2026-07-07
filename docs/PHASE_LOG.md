@@ -191,3 +191,27 @@ pytest tests/test_phase5_generator.py -m integration -v
 pytest tests/test_phase6_dashboard.py -v
 pytest tests/test_phase6_dashboard.py -m integration -v
 ```
+
+---
+
+## Phase 7 — Containerization (Docker)
+
+**Completed:** 2026-07-07
+
+### What we built
+- `Dockerfile` — Python 3.11 image, installs dependencies, runs Streamlit app
+- `docker-compose.yml` — app service, port mapping (`8501:8501`), `.env` injection, data volume mounts
+- `.dockerignore` — excludes local/dev artifacts from image build context
+- `tests/test_phase7_docker.py` — Docker artifact checks + optional `docker compose config` validation
+
+### Concepts
+- **Reproducible runtime:** App can run with consistent dependencies inside a container
+- **Data persistence:** PDF corpus and ChromaDB storage mounted via compose volumes
+- **Portable launch:** `docker compose up --build` brings up the full app service
+
+### Checkpoint
+4 tests passed (plus optional compose validation when Docker is available).
+
+```powershell
+pytest tests/test_phase7_docker.py -v
+```

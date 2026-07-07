@@ -66,7 +66,7 @@ This project delivers an **enterprise-grade Retrieval-Augmented Generation (RAG)
 | FR-07 | Generate grounded answer via OpenRouter | `src/generator.py` | ✅ |
 | FR-08 | End-to-end `query(question) -> RAGResponse` | `src/rag_pipeline.py` | ✅ |
 | FR-09 | Streamlit chat UI with source citations | `app/app.py` | ✅ |
-| FR-10 | Containerized deployment | `Dockerfile`, `docker-compose.yml` | ⬜ Phase 7 |
+| FR-10 | Containerized deployment | `Dockerfile`, `docker-compose.yml` | ✅ |
 
 ### 3.2 Non-Functional Requirements
 
@@ -206,7 +206,7 @@ TOP_K=5
 | **4** | Retrieval System | ✅ Complete | `pytest tests/test_phase4_retriever.py -v` |
 | **5** | LLM Generator | ✅ Complete | `pytest tests/test_phase5_generator.py -v` |
 | **6** | Streamlit Chat UI | ✅ Complete | `pytest tests/test_phase6_dashboard.py -v` |
-| **7** | Containerization (Docker) | ⬜ Pending | `pytest tests/test_phase7_docker.py -v` |
+| **7** | Containerization (Docker) | ✅ Complete | `pytest tests/test_phase7_docker.py -v` |
 
 **Status legend:** ⬜ Pending → 🟡 In Progress → ✅ Complete
 
@@ -271,3 +271,4 @@ FinancialComplianceRAG/
 | 2026-07-07 | 1.5 | Phase 4 complete — retriever module and top-k semantic search tests |
 | 2026-07-07 | 1.6 | Phase 5 complete — OpenRouter generator, citations, and checkpoint tests |
 | 2026-07-07 | 1.7 | Phase 6 complete — rag_pipeline, chat helpers, Streamlit chat UI, UI tests |
+| 2026-07-07 | 1.8 | Phase 7 complete — Dockerfile, compose stack, and containerization tests |
