@@ -115,3 +115,28 @@ pytest tests/test_phase2_ingest.py -m integration -v   # needs PDFs in data/raw_
 pytest tests/test_phase3_vectorstore.py -v
 pytest tests/test_phase3_vectorstore.py -m integration -v
 ```
+
+---
+
+## Phase 4 — Retrieval System
+
+**Completed:** 2026-07-07
+
+### What we built
+- `src/retriever.py` — query embedding + Chroma top-k retrieval with metadata and score
+- `src/schemas.py` — `RetrievalResult` model for typed retrieval outputs
+- `tests/test_phase4_retriever.py` — unit and integration checkpoint tests
+- Notebook Step 7 wired (retrieval demo against indexed corpus)
+
+### Concepts
+- **Top-k retrieval:** `n_results` defaults to `settings.top_k`, override per query when needed
+- **Grounding payload:** Retrieval returns `source`, `page`, `chunk_index`, `text`, and distance `score`
+- **Empty-safe behavior:** blank query or empty collection returns `[]` (no downstream crash)
+
+### Checkpoint
+4 unit tests passed and 1 integration test passed.
+
+```powershell
+pytest tests/test_phase4_retriever.py -v
+pytest tests/test_phase4_retriever.py -m integration -v
+```

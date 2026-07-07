@@ -70,7 +70,7 @@ FinancialComplianceRAG/
 | 1 | Project Setup & MLOps | ✅ Complete |
 | 2 | Document Ingestion | ✅ Complete |
 | 3 | Embeddings & Vector Store | ✅ Complete |
-| 4 | Retrieval System | ⬜ Pending |
+| 4 | Retrieval System | ✅ Complete |
 | 5 | LLM Generator | ⬜ Pending |
 | 6 | Streamlit Chat UI | ⬜ Pending |
 | 7 | Containerization (Docker) | ⬜ Pending |

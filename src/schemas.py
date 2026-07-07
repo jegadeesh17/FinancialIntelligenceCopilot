@@ -14,3 +14,13 @@ class DocumentChunk(BaseModel):
         ge=0,
         description="0-based chunk index within the source document",
     )
+
+
+class RetrievalResult(BaseModel):
+    """Single retrieved chunk and its similarity score."""
+
+    source: str = Field(..., min_length=1)
+    page: int = Field(..., ge=1)
+    text: str = Field(..., min_length=1)
+    chunk_index: int = Field(default=0, ge=0)
+    score: float = Field(..., description="Distance score from vector search")
