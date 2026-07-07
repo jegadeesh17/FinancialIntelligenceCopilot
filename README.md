@@ -78,8 +78,37 @@ FinancialComplianceRAG/
 Run scaffold test: `pytest tests/test_phase0_scaffold.py -v`  
 Full spec: [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)
 
+### **3-Command Quickstart**
+```powershell
+cd FinancialComplianceRAG
+pip install -r requirements.txt
+cp .env.example .env   # add OPENROUTER_API_KEY
+python scripts/download_docs.py; python scripts/seed_extra_pdfs.py; python scripts/build_index.py
+streamlit run app/app.py
+```
+
+**API (optional):**
+```powershell
+uvicorn api.main:app --port 8000
+```
+
+**Retrieval evaluation:**
+```powershell
+python scripts/eval_retrieval.py
+```
+
 ---
-### **Interactive Application Deployment**
+### **Retrieval Evaluation**
+- Eval set: `data/eval_questions.json` (10 questions)
+- Script: `python scripts/eval_retrieval.py`
+- Report: `reports/retrieval_eval.json` and [reports/evaluation.md](reports/evaluation.md)
+- Target: ≥ 70% retrieval hit rate
+
+---
+### **Demo Script**
+See [docs/DEMO.md](docs/DEMO.md) for a 5-minute interview demo flow.
+
+---
 ```powershell
 cd FinancialComplianceRAG
 pip install -r requirements.txt

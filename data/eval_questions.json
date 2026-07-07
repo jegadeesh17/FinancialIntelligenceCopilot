@@ -1,0 +1,72 @@
+[
+  {
+    "id": "kyc-001",
+    "question": "What identification documents are required for individual customers under KYC?",
+    "expected_doc": "rbi_master_direction_kyc.pdf",
+    "expected_page_min": 1,
+    "expected_page_max": 30
+  },
+  {
+    "id": "kyc-002",
+    "question": "What are the minimum KYC requirements for banks?",
+    "expected_doc": "rbi_master_direction_kyc.pdf",
+    "expected_page_min": 1,
+    "expected_page_max": 30
+  },
+  {
+    "id": "capital-001",
+    "question": "What is the capital adequacy position reported in the annual report?",
+    "expected_doc": "HDFC_Bank_Annual_Report",
+    "expected_page_min": 1,
+    "expected_page_max": 500
+  },
+  {
+    "id": "hdfc-001",
+    "question": "What was HDFC Bank net interest income?",
+    "expected_doc": "HDFC_Bank_Annual_Report",
+    "expected_page_min": 1,
+    "expected_page_max": 500
+  },
+  {
+    "id": "hdfc-002",
+    "question": "How did total deposits change for HDFC Bank?",
+    "expected_doc": "HDFC_Bank_Annual_Report",
+    "expected_page_min": 1,
+    "expected_page_max": 500
+  },
+  {
+    "id": "sebi-001",
+    "question": "What disclosure obligations apply to listed entities under SEBI LODR?",
+    "expected_doc": "sebi_circular_disclosure.pdf",
+    "expected_page_min": 1,
+    "expected_page_max": 20
+  },
+  {
+    "id": "sebi-002",
+    "question": "What is the business responsibility report requirement for listed companies?",
+    "expected_doc": "sebi_circular_disclosure.pdf",
+    "expected_page_min": 1,
+    "expected_page_max": 20
+  },
+  {
+    "id": "aml-001",
+    "question": "What are AML and CFT requirements mentioned in RBI master directions?",
+    "expected_doc": "rbi_master_direction_aml",
+    "expected_page_min": 1,
+    "expected_page_max": 40
+  },
+  {
+    "id": "aml-002",
+    "question": "What customer due diligence steps are required under anti money laundering rules?",
+    "expected_doc": "rbi_master_direction_aml",
+    "expected_page_min": 1,
+    "expected_page_max": 40
+  },
+  {
+    "id": "lodr-001",
+    "question": "What corporate governance disclosures are required under SEBI listing obligations?",
+    "expected_doc": "sebi_lodr_governance",
+    "expected_page_min": 1,
+    "expected_page_max": 30
+  }
+]

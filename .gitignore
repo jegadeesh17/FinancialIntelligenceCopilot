@@ -8,6 +8,7 @@ data/chroma_db/*
 !data/chroma_db/.keep
 data/*
 !data/.keep
+!data/eval_questions.json
 models/*
 !models/.keep
 .pytest_cache/

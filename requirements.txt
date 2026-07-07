@@ -16,5 +16,9 @@ httpx==0.28.1
 # Phase 6 — chat UI
 streamlit==1.40.2
 
+# Portfolio API layer
+fastapi==0.115.6
+uvicorn==0.32.1
+
 # Dev / testing
 pytest==8.3.4
