@@ -22,13 +22,13 @@ Financial Compliance RAG is an enterprise Retrieval-Augmented Generation system 
 ---
 ### **Dataset**
 - **Corpus:** Compliance-first mixed — ~40% regulatory circulars, ~40% annual reports/10-K, ~20% insurance guidelines
-- **Initial PDFs (Phase 2–3):** 1 RBI circular + 1 bank annual report + 1 Tesla 10-K
+- **Initial PDFs (Phase 2–3):** 1 RBI circular + 1 HDFC Bank annual report + 1 SEBI circular
 - **Full target:** 15–20 PDFs by Phase 6
 - **Storage:** `data/raw_pdfs/` (gitignored), vectors in `data/chroma_db/` (gitignored)
 
 **Sample questions:**
 - *"What is the minimum capital requirement in the RBI master direction?"*
-- *"What were Tesla's total automotive revenues?"*
+- *"What is HDFC Bank's net interest income?"*
 
 ---
 ### **Project Structure**

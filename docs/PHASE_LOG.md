@@ -29,7 +29,7 @@ Use this file to capture what you learned each phase.
 - Corpus: ~40% regulatory / ~40% annual reports / ~20% insurance
 - LLM: OpenRouter (`openrouter/free`)
 - Embeddings: `all-MiniLM-L6-v2` on CPU
-- Vector DB: ChromaDB
+- Initial PDFs: 3 (1 RBI + 1 HDFC Bank annual report + 1 SEBI circular)
 
 ### Checkpoint command
 ```powershell

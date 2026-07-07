@@ -7,7 +7,7 @@
 | Field | Value |
 |-------|-------|
 | **Document** | PROJECT_SPEC.md |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Status** | Finalized — scaffold pushed; Phase 1 pending |
 | **Last updated** | 2026-07-07 |
 | **Repository** | [github.com/jegadeesh17/FinancialComplianceRAG](https://github.com/jegadeesh17/FinancialComplianceRAG) |
@@ -156,7 +156,7 @@ User query ──▶ src/retriever.py ──▶ top-k chunks
 | Vector DB | ✅ Locked | ChromaDB (persistent local) |
 | Chunk size / overlap | ✅ Locked | 800 / 100 chars, paragraph-aware |
 | Top-k retrieval | ✅ Locked | 5 chunks |
-| Initial PDFs | ✅ Locked | 3 (1 RBI + 1 bank annual report + 1 Tesla 10-K) |
+| Initial PDFs | ✅ Locked | 3 (1 RBI circular + 1 HDFC Bank annual report + 1 SEBI circular) |
 | Full corpus target | ✅ Locked | 15–20 PDFs by Phase 6 |
 
 ### Environment Variables (`.env`)
@@ -182,15 +182,15 @@ TOP_K=5
 | Class | Share | Examples |
 |-------|-------|----------|
 | Regulatory circulars | ~40% | RBI Master Directions, SEBI circulars |
-| Annual reports / 10-K | ~40% | Tesla 10-K, HDFC Bank annual report |
+| Annual reports / 10-K | ~40% | HDFC Bank annual report, Reliance annual report |
 | Insurance guidelines | ~20% | IRDAI guidelines |
 
 ### 6.2 Sample Evaluation Questions
 
 - *"What is the minimum capital requirement in the RBI master direction?"*
 - *"What KYC documents are required for individual customers?"*
-- *"What were Tesla's total automotive revenues?"*
 - *"What is HDFC Bank's net interest income?"*
+- *"What is HDFC Bank's total deposits as per the annual report?"*
 
 ---
 
@@ -264,3 +264,4 @@ FinancialComplianceRAG/
 | Date | Version | Change |
 |------|---------|--------|
 | 2026-07-07 | 1.0 | Spec finalized; scaffold pushed to GitHub |
+| 2026-07-07 | 1.1 | Initial PDFs: Tesla 10-K replaced with HDFC Bank annual report |
