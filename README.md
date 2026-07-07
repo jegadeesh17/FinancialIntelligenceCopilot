@@ -71,7 +71,7 @@ FinancialComplianceRAG/
 | 2 | Document Ingestion | ✅ Complete |
 | 3 | Embeddings & Vector Store | ✅ Complete |
 | 4 | Retrieval System | ✅ Complete |
-| 5 | LLM Generator | ⬜ Pending |
+| 5 | LLM Generator | ✅ Complete |
 | 6 | Streamlit Chat UI | ⬜ Pending |
 | 7 | Containerization (Docker) | ⬜ Pending |
 

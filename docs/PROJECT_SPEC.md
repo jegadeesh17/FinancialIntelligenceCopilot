@@ -63,7 +63,7 @@ This project delivers an **enterprise-grade Retrieval-Augmented Generation (RAG)
 | FR-04 | Embed chunks with Sentence-Transformers | `src/embeddings.py` | ✅ |
 | FR-05 | Persist embeddings in ChromaDB | `src/vectorstore.py` | ✅ |
 | FR-06 | Retrieve top-k similar chunks for a query | `src/retriever.py` | ✅ |
-| FR-07 | Generate grounded answer via OpenRouter | `src/generator.py` | ⬜ Phase 5 |
+| FR-07 | Generate grounded answer via OpenRouter | `src/generator.py` | ✅ |
 | FR-08 | End-to-end `query(question) -> RAGResponse` | `src/rag_pipeline.py` | ⬜ Phase 6 |
 | FR-09 | Streamlit chat UI with source citations | `app/app.py` | ⬜ Phase 6 |
 | FR-10 | Containerized deployment | `Dockerfile`, `docker-compose.yml` | ⬜ Phase 7 |
@@ -204,7 +204,7 @@ TOP_K=5
 | **2** | Document Ingestion | ✅ Complete | `pytest tests/test_phase2_ingest.py -v` |
 | **3** | Embeddings & Vector Store | ✅ Complete | `pytest tests/test_phase3_vectorstore.py -v` |
 | **4** | Retrieval System | ✅ Complete | `pytest tests/test_phase4_retriever.py -v` |
-| **5** | LLM Generator | ⬜ Pending | `pytest tests/test_phase5_generator.py -v` |
+| **5** | LLM Generator | ✅ Complete | `pytest tests/test_phase5_generator.py -v` |
 | **6** | Streamlit Chat UI | ⬜ Pending | `pytest tests/test_phase6_dashboard.py -v` |
 | **7** | Containerization (Docker) | ⬜ Pending | `pytest tests/test_phase7_docker.py -v` |
 
@@ -269,3 +269,4 @@ FinancialComplianceRAG/
 | 2026-07-07 | 1.3 | Phase 2 complete — ingest pipeline and download script |
 | 2026-07-07 | 1.4 | Phase 3 complete — embeddings, vectorstore, and ChromaDB persistence |
 | 2026-07-07 | 1.5 | Phase 4 complete — retriever module and top-k semantic search tests |
+| 2026-07-07 | 1.6 | Phase 5 complete — OpenRouter generator, citations, and checkpoint tests |

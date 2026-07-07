@@ -24,3 +24,18 @@ class RetrievalResult(BaseModel):
     text: str = Field(..., min_length=1)
     chunk_index: int = Field(default=0, ge=0)
     score: float = Field(..., description="Distance score from vector search")
+
+
+class Citation(BaseModel):
+    """Citation entry for grounded responses."""
+
+    source: str = Field(..., min_length=1)
+    page: int = Field(..., ge=1)
+
+
+class RAGResponse(BaseModel):
+    """Final generated answer with supporting citations."""
+
+    answer: str = Field(..., min_length=1)
+    citations: list[Citation] = Field(default_factory=list)
+    model: str = Field(default="")

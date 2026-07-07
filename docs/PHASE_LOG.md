@@ -140,3 +140,28 @@ pytest tests/test_phase3_vectorstore.py -m integration -v
 pytest tests/test_phase4_retriever.py -v
 pytest tests/test_phase4_retriever.py -m integration -v
 ```
+
+---
+
+## Phase 5 — LLM Generator
+
+**Completed:** 2026-07-07
+
+### What we built
+- `src/generator.py` — OpenRouter call wrapper, grounded prompt builder, citation-aware response assembly
+- `src/schemas.py` — `Citation` and `RAGResponse` models
+- `tests/test_phase5_generator.py` — prompt, guardrails, mocked generation, and optional live integration checks
+- Notebook Step 8 wired (retrieve + generate + citation display)
+
+### Concepts
+- **Grounded prompting:** LLM is instructed to answer strictly from retrieved context
+- **Guardrails:** Empty question and empty context produce safe deterministic responses
+- **Citations:** Output carries structured source/page references for auditability
+
+### Checkpoint
+4 unit tests passed. Integration test is environment-dependent and skipped without `OPENROUTER_API_KEY`.
+
+```powershell
+pytest tests/test_phase5_generator.py -v
+pytest tests/test_phase5_generator.py -m integration -v
+```
