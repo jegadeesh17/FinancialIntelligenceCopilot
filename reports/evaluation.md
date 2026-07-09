@@ -10,12 +10,12 @@ Run `python scripts/eval_retrieval.py` to regenerate this report.
 ## Latest Results
 - **Hit rate:** 90.0% (9/10) — see `reports/retrieval_eval.json`
 - **Chunk count:** 3459
-- **Corpus:** 5 PDFs (RBI KYC, HDFC annual report, SEBI circular, AML + LODR seeds)
+- **Corpus:** varies by local `data/raw_pdfs/` contents at index-build time
 
 ## Notes
 - Eval measures **retrieval quality**, not LLM answer quality
 - Empty vector store returns 0% — run `python scripts/build_index.py` first
-- Supplementary PDFs: `python scripts/seed_extra_pdfs.py`
+- Track corpus size using `/health` and `data/chroma_db/index_meta.json` after each rebuild
 
 ## Interview Framing
 Report hit rate honestly. If a question misses, explain whether chunking, corpus gap, or query phrasing caused it.

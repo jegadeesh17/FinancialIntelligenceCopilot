@@ -21,8 +21,8 @@
 
 ---
 ### **Dataset**
-- **Foundation corpus (11 PDFs):** 4 regulatory + 5 annual reports + 2 IRDAI insurance circulars
-- **Annual reports (finalized):** HDFC Bank, ICICI Bank, Reliance Industries, Tata Consumer Products, TCS
+- **Corpus composition:** compliance/regulatory PDFs and financial-report PDFs
+- **Current indexed size:** run `python scripts/build_index.py` and check `/health` or the Streamlit sidebar
 - **Storage:** `data/raw_pdfs/` (gitignored), vectors in `data/chroma_db/` (gitignored)
 - **Manual PDF guide:** [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)
 

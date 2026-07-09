@@ -229,10 +229,10 @@ pytest tests/test_phase7_docker.py -v
 **Completed:** 2026-07-09
 
 ### What we built
-- `scripts/scrape_latest_quarterly_pdfs.py` — scrape/discover latest quarterly-result PDFs
-- `scripts/backfill_current_fy_quarterly_pdfs.py` — current financial-year backfill per company
-- `scripts/refresh_dual_vertical_index.py` — corpus ratio checks + index rebuild
-- `requirements.txt` update — `beautifulsoup4`
+- Consolidated corpus operations around existing utilities:
+  - `scripts/download_docs.py` for optional source download bootstrap
+  - `scripts/build_index.py` for index rebuild and metadata refresh
+  - `scripts/eval_retrieval.py` for retrieval hit-rate checks
 
 ### Concepts
 - **Source authority:** official PDFs remain the source of truth for RAG ingestion
@@ -240,12 +240,12 @@ pytest tests/test_phase7_docker.py -v
 - **Portfolio practicality:** enough automation for demos without scheduler/service sprawl
 
 ### Checkpoint
-- New scripts compile and run as standalone utilities.
+- Existing corpus utilities compile and run as standalone utilities.
 
 ```powershell
-python scripts/scrape_latest_quarterly_pdfs.py
-python scripts/backfill_current_fy_quarterly_pdfs.py
-python scripts/refresh_dual_vertical_index.py
+python scripts/download_docs.py
+python scripts/build_index.py
+python scripts/eval_retrieval.py
 ```
 
 ---
@@ -284,15 +284,16 @@ pytest tests/test_phase2_ingest.py tests/test_phase4_retriever.py tests/test_api
 - Consolidated to one integrated resume: `ZGeneral/Jegadeesh_D_Course_Model_Resume.md`
 - Moved stale ZGeneral files to `.trash/20260709/`
 - **Phase 10A:** Dual-vertical UI (vertical metrics, sample queries, confidence badges, market snapshot timestamp)
-- **Phase 10B:** Added `tests/test_scrape_quarterly.py` and `tests/test_refresh_dual_vertical_index.py`
+- **Phase 10B:** Hardened core test coverage (`tests/test_api.py`, retrieval/config checks, corpus stats checks)
 - **Phase 10C:** Updated `README.md` and `docs/DEMO.md` with dual-vertical demo flow
-- **Phase 10D:** Verification run (`pytest -m "not integration" -q`, refresh script)
+- **Phase 10D:** Verification run (`pytest -m "not integration" -q`, index build, retrieval eval)
 - **Phase 10E:** Archived local `AgenticMarketResearcher` to `.trash/20260709/`
 
 ### Checkpoint
 ```powershell
 pytest -m "not integration" -q
-python scripts/refresh_dual_vertical_index.py
+python scripts/build_index.py
+python scripts/eval_retrieval.py
 streamlit run app/app.py
 ```
 

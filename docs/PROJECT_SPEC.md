@@ -45,10 +45,8 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | 6 | Streamlit chat UI with citation display (doc name + page) |
 | 7 | Docker containerization |
 | 8 | Per-phase pytest checkpoint tests |
-| 9 | Quarterly-result PDF discovery workflow (manual-first, source-validated) |
-| 10 | Current FY backfill scraping and manifest dedup tracking |
-| 11 | Corpus ratio health checks for compliance vs earnings mix |
-| 12 | Corpus telemetry and confidence-oriented UX signals |
+| 9 | Corpus ratio health checks for compliance vs earnings mix |
+| 10 | Corpus telemetry and confidence-oriented UX signals |
 
 ### 2.2 Out of Scope
 
@@ -78,7 +76,7 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | FR-10 | Containerized deployment | `Dockerfile`, `docker-compose.yml` | ✅ |
 | FR-11 | Flag weak retrieval confidence by distance threshold | `src/retriever.py`, `src/config.py` | ✅ |
 | FR-12 | Return confidence fields in `/ask` and UI | `api/main.py`, `app/app.py` | ✅ |
-| FR-13 | Attach vertical metadata to chunks (source_url, company, regulator, vertical) | `src/ingest_docs.py`, `src/vectorstore.py` | ✅ |
+| FR-13 | Attach metadata to chunks (`retrieved_at`, `regulator`, `document_category`) | `src/ingest_docs.py`, `src/vectorstore.py` | ✅ |
 | FR-14 | Expose corpus mix summary in API health + UI sidebar | `src/corpus_stats.py`, `api/main.py`, `app/app.py` | ✅ |
 
 ### 3.2 Non-Functional Requirements
@@ -220,7 +218,7 @@ TOP_K=5
 | **5** | LLM Generator | ✅ Complete | `pytest tests/test_phase5_generator.py -v` |
 | **6** | Streamlit Chat UI | ✅ Complete | `pytest tests/test_phase6_dashboard.py -v` |
 | **7** | Containerization (Docker) | ✅ Complete | `pytest tests/test_phase7_docker.py -v` |
-| **8** | Dual-Vertical Scraping & Corpus Ops | ✅ Complete | `python scripts/refresh_dual_vertical_index.py` |
+| **8** | Corpus Ops | ✅ Complete | `python scripts/build_index.py` |
 | **9** | Confidence Gate + Metadata Propagation | ✅ Complete | `pytest tests/test_phase2_ingest.py tests/test_phase4_retriever.py tests/test_api.py -q` |
 | **10** | Hardening, Resume Unification, Cleanup | 🟡 In Progress | pending |
 
