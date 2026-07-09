@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 import httpx
 
 from src.config import Settings, get_settings
@@ -30,12 +32,19 @@ def build_prompt(question: str, contexts: list[RetrievalResult]) -> str:
     )
 
 
-def _call_openrouter(prompt: str, settings: Settings) -> str:
+def _is_invalid_output(answer: str) -> bool:
+    text = (answer or "").strip()
+    if not text:
+        return True
+    return text.lower().startswith("user safety:")
+
+
+def _call_openrouter(prompt: str, settings: Settings, model_slug: str) -> tuple[str, str]:
     if not settings.openrouter_api_key or settings.openrouter_api_key.startswith("sk-or-v1-your"):
         raise ValueError("OPENROUTER_API_KEY is missing. Set it in .env before live generation.")
 
     payload = {
-        "model": settings.openrouter_model,
+        "model": model_slug,
         "messages": [
             {"role": "system", "content": "You provide grounded answers from supplied context."},
             {"role": "user", "content": prompt},
@@ -50,7 +59,9 @@ def _call_openrouter(prompt: str, settings: Settings) -> str:
         response = client.post(OPENROUTER_URL, headers=headers, json=payload)
         response.raise_for_status()
         data = response.json()
-    return data["choices"][0]["message"]["content"].strip()
+    content = data["choices"][0]["message"]["content"].strip()
+    model_used = str(data.get("model") or model_slug)
+    return content, model_used
 
 
 def _make_citations(contexts: list[RetrievalResult]) -> list[Citation]:
@@ -82,9 +93,36 @@ def generate_answer(
         )
 
     prompt = build_prompt(question, contexts)
-    answer = _call_openrouter(prompt, settings=settings)
+    model_candidates = [settings.openrouter_model, *settings.fallback_models]
+    model_candidates = list(dict.fromkeys(model_candidates))
+    answer = ""
+    model_used = settings.openrouter_model
+    last_error: Exception | None = None
+
+    for model_slug in model_candidates:
+        for attempt in range(1, settings.llm_max_retries + 1):
+            try:
+                answer, model_used = _call_openrouter(prompt, settings=settings, model_slug=model_slug)
+                if _is_invalid_output(answer):
+                    raise ValueError(f"Invalid classifier-style output from model: {model_slug}")
+                last_error = None
+                break
+            except Exception as exc:  # pragma: no cover - network/provider variability
+                last_error = exc
+                if attempt < settings.llm_max_retries:
+                    time.sleep(0.4 * attempt)
+        if last_error is None:
+            break
+
+    if last_error is not None:
+        return RAGResponse(
+            answer="I could not generate a reliable answer right now. Please try again.",
+            citations=[],
+            model=model_used,
+        )
+
     return RAGResponse(
         answer=answer,
         citations=_make_citations(contexts),
-        model=settings.openrouter_model,
+        model=model_used,
     )

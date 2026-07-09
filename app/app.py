@@ -1,6 +1,10 @@
-import json
+"""Financial Intelligence Copilot — product Streamlit UI."""
+
+from __future__ import annotations
+
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -9,46 +13,129 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.chat import append_message, format_citations, init_chat_state
-from src.corpus_stats import classify_pdf_names, summarize_corpus
-from src.generator import generate_answer
-from src.indexing import read_index_metadata
-from src.retriever import get_best_score, is_low_confidence, retrieve
-from src.telemetry import log_query
-from src.vectorstore import build_vector_index, get_chroma_client, get_collection_count, get_or_create_collection
+
+def _load_ui_styles():
+    """Load UI constants from disk (avoids Streamlit stale import cache)."""
+    import importlib.util
+
+    path = PROJECT_ROOT / "src" / "ui_styles.py"
+    spec = importlib.util.spec_from_file_location("fic_ui_styles", path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load UI styles from {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+_ui = _load_ui_styles()
+PRODUCT_CSS = _ui.PRODUCT_CSS
+CATEGORY_LABELS = _ui.CATEGORY_LABELS
+SAMPLE_QUERIES = _ui.SAMPLE_QUERIES
+citation_chips_html = _ui.citation_chips_html
+
+from src.chat import append_message, init_chat_state  # noqa: E402
+from src.corpus_stats import classify_document_category, list_pdfs_by_category, summarize_corpus  # noqa: E402
+from src.generator import generate_answer  # noqa: E402
+from src.indexing import read_index_metadata  # noqa: E402
+from src.retriever import get_best_score, is_low_confidence, retrieve  # noqa: E402
+from src.telemetry import log_query  # noqa: E402
+from src.vectorstore import build_vector_index, get_chroma_client, get_collection_count, get_or_create_collection  # noqa: E402
 
 RAW_PDF_DIR = PROJECT_ROOT / "data" / "raw_pdfs"
-MARKET_SNAPSHOT_PATH = PROJECT_ROOT / "data" / "market_signals" / "moneycontrol_top5_snapshot.json"
 
-COMPLIANCE_SAMPLE = "What KYC documents are required for individual customers?"
-EARNINGS_SAMPLE = "What was HDFC Bank net interest income in the annual report?"
+st.set_page_config(
+    page_title="Financial Intelligence Copilot",
+    page_icon="📈",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-st.set_page_config(page_title="Financial Intelligence Copilot", layout="wide")
-st.title("Financial Intelligence Copilot")
-st.caption("Dual-vertical RAG for compliance circulars and quarterly earnings filings.")
 
-
-def _load_market_snapshot() -> dict:
-    if not MARKET_SNAPSHOT_PATH.exists():
-        return {}
+def _format_index_time(iso_value: str | None) -> str:
+    if not iso_value or iso_value == "unknown":
+        return "Not indexed yet"
     try:
-        return json.loads(MARKET_SNAPSHOT_PATH.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+        dt = datetime.fromisoformat(iso_value.replace("Z", "+00:00"))
+        return dt.strftime("%d %b %Y, %H:%M UTC")
+    except ValueError:
+        return iso_value
 
 
-def _vertical_for_filename(filename: str, manifest_map: dict[str, dict]) -> str:
-    row = manifest_map.get(filename, {})
-    if filename.startswith("earnings_") or row.get("vertical") == "earnings":
-        return "earnings"
-    return "compliance"
-
-
-def _confidence_badge(low_confidence: bool) -> None:
+def _confidence_html(low_confidence: bool) -> str:
     if low_confidence:
-        st.error("Retrieval confidence: LOW")
-    else:
-        st.success("Retrieval confidence: OK")
+        return '<span class="fic-badge-low">Low confidence — verify sources</span>'
+    return '<span class="fic-badge-ok">Grounded answer</span>'
+
+
+def _render_hero(total_pdfs: int, vector_count: int, category_counts: dict) -> None:
+    pills = [
+        f"{total_pdfs} documents",
+        f"{vector_count:,} indexed chunks" if vector_count else "Index pending",
+    ]
+    for key in ("regulatory", "annual_report", "insurance", "exam_reference"):
+        if category_counts.get(key):
+            pills.append(f"{category_counts[key]} {CATEGORY_LABELS.get(key, key).lower()}")
+
+    pill_html = "".join(f'<span class="fic-pill">{p}</span>' for p in pills)
+    st.markdown(
+        f"""
+        <div class="fic-hero">
+            <h1>Financial Intelligence Copilot</h1>
+            <p>Ask natural-language questions across regulations, annual reports, insurance circulars,
+            and exam reference material — with page-level citations from your private document library.</p>
+            <div class="fic-pill-row">{pill_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def _indexed_chunk_counts() -> dict[str, int]:
+    collection = get_or_create_collection(get_chroma_client())
+    rows = collection.get(include=["metadatas"])
+    counts: dict[str, int] = {}
+    for md in rows.get("metadatas", []):
+        if not md:
+            continue
+        source = str(md.get("source", ""))
+        counts[source] = counts.get(source, 0) + 1
+    return counts
+
+
+def _render_knowledge_base() -> None:
+    pdf_files = sorted(RAW_PDF_DIR.glob("*.pdf"))
+    if not pdf_files:
+        st.info("Your knowledge base is empty. Add PDFs to `data/raw_pdfs/` and rebuild the index.")
+        return
+
+    counts = _indexed_chunk_counts()
+    by_category = list_pdfs_by_category(RAW_PDF_DIR)
+
+    for category, names in by_category.items():
+        label = CATEGORY_LABELS.get(category, category.replace("_", " ").title())
+        rows_html = []
+        for name in names:
+            pdf_path = RAW_PDF_DIR / name
+            chunk_count = counts.get(name, 0)
+            size_mb = pdf_path.stat().st_size / (1024 * 1024)
+            status = "Indexed" if chunk_count else "Pending"
+            rows_html.append(
+                f"""
+                <div class="fic-doc-row">
+                    <div class="fic-doc-name">{name}</div>
+                    <div class="fic-doc-meta">{size_mb:.1f} MB · {chunk_count} chunks · {status}</div>
+                </div>
+                """
+            )
+        st.markdown(
+            f"""
+            <div class="fic-card fic-category-{category}" style="margin-bottom:1rem;">
+                <div class="fic-section-label">{label} ({len(names)})</div>
+                {''.join(rows_html)}
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 def _run_query(prompt: str, top_k: int, max_distance: float) -> None:
@@ -57,7 +144,7 @@ def _run_query(prompt: str, top_k: int, max_distance: float) -> None:
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Retrieving context and generating answer..."):
+        with st.spinner("Searching your documents and drafting an answer..."):
             start = time.perf_counter()
             try:
                 contexts = retrieve(prompt, top_k=top_k, max_distance=max_distance)
@@ -65,19 +152,18 @@ def _run_query(prompt: str, top_k: int, max_distance: float) -> None:
                 low_confidence = is_low_confidence(contexts)
                 best_score = get_best_score(contexts)
 
-                _confidence_badge(low_confidence)
-                st.markdown("**Summary**")
+                st.markdown(_confidence_html(low_confidence), unsafe_allow_html=True)
                 st.markdown(response.answer)
 
                 if low_confidence:
-                    suffix = f" (best distance={best_score:.4f})" if best_score is not None else ""
-                    st.warning(
-                        "Evidence may be stale or too weak"
-                        f"{suffix}. Run refresh scripts and retry."
-                    )
+                    suffix = f" Best match distance: {best_score:.3f}." if best_score is not None else ""
+                    st.caption(f"We found limited supporting evidence.{suffix}")
 
-                st.markdown("**Citations**")
-                st.caption(format_citations(response.citations))
+                if response.citations:
+                    st.markdown(
+                        f'<div style="margin-top:0.75rem;">{citation_chips_html(response.citations)}</div>',
+                        unsafe_allow_html=True,
+                    )
 
                 append_message("assistant", response.answer, response.citations)
                 st.session_state.messages[-1]["contexts"] = [
@@ -86,7 +172,7 @@ def _run_query(prompt: str, top_k: int, max_distance: float) -> None:
                         "page": c.page,
                         "score": c.score,
                         "text": c.text,
-                        "document_vertical": c.document_vertical,
+                        "document_category": c.document_category,
                     }
                     for c in contexts
                 ]
@@ -101,151 +187,120 @@ def _run_query(prompt: str, top_k: int, max_distance: float) -> None:
                     or low_confidence
                 )
                 log_query(prompt, top_sources=top_sources, fallback_used=fallback_used, latency_ms=latency_ms)
-                if fallback_used:
-                    st.info("Insufficient evidence found. Try a sample query or refresh the corpus.")
             except Exception as exc:  # pragma: no cover
-                message = f"Error: {exc}"
-                st.error(message)
-                append_message("assistant", message, [])
+                st.error(f"Something went wrong: {exc}")
+                append_message("assistant", f"Error: {exc}", [])
 
 
-with st.sidebar:
-    st.subheader("RAG Controls")
-    top_k = st.slider("Top-k retrieval", min_value=1, max_value=10, value=5, step=1)
-    max_distance = st.slider("Max retrieval distance", min_value=0.0, max_value=2.0, value=1.2, step=0.05)
-    show_debug = st.toggle("Show retrieved context", value=False)
-    clear_chat = st.button("Clear chat")
+# --- Page bootstrap ---
+st.markdown(PRODUCT_CSS, unsafe_allow_html=True)
 
-    corpus_stats = summarize_corpus(RAW_PDF_DIR)
-    try:
-        vector_count = get_collection_count()
-    except Exception:
-        vector_count = 0
-    meta = read_index_metadata()
-    snapshot = _load_market_snapshot()
-
-    st.markdown("---")
-    st.subheader("Vertical view")
-    vc = corpus_stats.get("vertical_counts", {})
-    st.metric("Compliance PDFs", vc.get("compliance", 0))
-    st.metric("Earnings PDFs", vc.get("earnings", 0))
-    st.caption(f"Earnings ratio: **{corpus_stats.get('earnings_ratio', 0.0):.2f}**")
-
-    companies = corpus_stats.get("company_counts", {})
-    if companies:
-        top_companies = ", ".join(f"{k} ({v})" for k, v in sorted(companies.items(), key=lambda x: -x[1])[:5])
-        st.caption(f"Companies indexed: **{top_companies}**")
-    else:
-        st.caption("Companies indexed: none yet (run earnings scrapers)")
-
-    if snapshot.get("as_of"):
-        st.caption(f"Market snapshot: **{snapshot['as_of']}**")
-    else:
-        st.caption("Market snapshot: not generated")
-
-    st.markdown("---")
-    st.caption(f"Indexed chunks: **{vector_count}**")
-    st.caption(f"Last indexed: **{meta.get('last_indexed_at', 'unknown')}**")
-
-    if vector_count == 0:
-        st.warning("Index is empty. Run `python scripts/build_index.py` once.")
-
-    confirm_rebuild = st.checkbox("Confirm rebuild index")
-    if st.button("Rebuild index", disabled=not confirm_rebuild):
-        with st.spinner("Rebuilding vector index..."):
-            stored = build_vector_index()
-        st.success(f"Rebuilt index with {stored} chunks.")
-        st.rerun()
+corpus_stats = summarize_corpus(RAW_PDF_DIR)
+try:
+    vector_count = get_collection_count()
+except Exception:
+    vector_count = 0
+meta = read_index_metadata()
 
 init_chat_state()
-if clear_chat:
-    st.session_state.messages = [st.session_state.messages[0]]
-    st.rerun()
-
 if "pending_prompt" not in st.session_state:
     st.session_state.pending_prompt = None
 
-main_col, docs_col = st.columns([3, 2])
+# Defaults for retrieval settings (sidebar may override)
+top_k = 5
+max_distance = 1.2
+show_debug = False
 
-with main_col:
-    st.subheader("Ask")
-    q1, q2 = st.columns(2)
-    if q1.button("Compliance sample query", use_container_width=True):
-        st.session_state.pending_prompt = COMPLIANCE_SAMPLE
-    if q2.button("Earnings sample query", use_container_width=True):
-        st.session_state.pending_prompt = EARNINGS_SAMPLE
+# --- Sidebar ---
+with st.sidebar:
+    st.markdown("### Copilot")
+    st.caption("Private RAG workspace for finance research and compliance.")
+
+    st.markdown('<p class="fic-section-label">Library status</p>', unsafe_allow_html=True)
+    st.markdown(
+        f"""
+        <div class="fic-card-muted">
+            <div style="font-size:0.85rem;color:#0f172a;font-weight:600;">
+                {corpus_stats.get('total_pdfs', 0)} source documents
+            </div>
+            <div style="font-size:0.78rem;color:#64748b;margin-top:0.25rem;">
+                {vector_count:,} chunks indexed
+            </div>
+            <div style="font-size:0.78rem;color:#64748b;margin-top:0.15rem;">
+                Last rebuild: {_format_index_time(meta.get('last_indexed_at'))}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if vector_count == 0:
+        st.warning("Index not built yet. Open **Settings** below to rebuild.")
+
+    with st.expander("Settings", expanded=False):
+        top_k = st.slider("Sources per answer", min_value=1, max_value=10, value=5, step=1)
+        max_distance = st.slider("Relevance threshold", min_value=0.0, max_value=2.0, value=1.2, step=0.05)
+        show_debug = st.toggle("Show source excerpts", value=False)
+        if st.button("Clear conversation", use_container_width=True):
+            st.session_state.messages = [st.session_state.messages[0]]
+            st.rerun()
+
+    with st.expander("Admin", expanded=False):
+        st.caption("Rebuild after adding or replacing PDFs in `data/raw_pdfs/`.")
+        if st.button("Rebuild document index", use_container_width=True):
+            with st.spinner("Indexing documents..."):
+                stored = build_vector_index()
+            st.success(f"Indexed {stored:,} chunks.")
+            st.rerun()
+
+# --- Main content ---
+_render_hero(
+    total_pdfs=corpus_stats.get("total_pdfs", 0),
+    vector_count=vector_count,
+    category_counts=corpus_stats.get("category_counts", {}),
+)
+
+tab_copilot, tab_library = st.tabs(["Ask Copilot", "Knowledge base"])
+
+with tab_copilot:
+    st.markdown('<p class="fic-section-label">Suggested questions</p>', unsafe_allow_html=True)
+    prompt_cols = st.columns(4)
+    for col, (key, item) in zip(prompt_cols, SAMPLE_QUERIES.items()):
+        with col:
+            if st.button(item["label"], use_container_width=True, key=f"sample_{key}"):
+                st.session_state.pending_prompt = item["query"]
+
+    st.markdown("")
 
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
-            if msg["role"] == "assistant":
-                _confidence_badge(bool(msg.get("low_confidence")))
-                st.markdown("**Summary**")
+            if msg["role"] == "assistant" and "low_confidence" in msg:
+                st.markdown(_confidence_html(bool(msg.get("low_confidence"))), unsafe_allow_html=True)
             st.markdown(msg["content"])
-            if msg["role"] == "assistant":
-                st.markdown("**Citations**")
-                st.caption(format_citations(msg.get("citations", [])))
+            if msg["role"] == "assistant" and msg.get("citations"):
+                st.markdown(
+                    f'<div style="margin-top:0.5rem;">{citation_chips_html(msg.get("citations", []))}</div>',
+                    unsafe_allow_html=True,
+                )
             if msg["role"] == "assistant" and show_debug and msg.get("contexts"):
-                with st.expander("Retrieved context"):
+                with st.expander("Source excerpts"):
                     for i, ctx in enumerate(msg["contexts"], start=1):
-                        vertical = ctx.get("document_vertical", "compliance")
+                        category = ctx.get("document_category", "annual_report")
                         st.markdown(
-                            f"**{i}.** [{vertical}] `{ctx['source']}` p.{ctx['page']} "
-                            f"| score={ctx['score']:.4f}\n\n{ctx['text'][:320]}..."
+                            f"**{i}.** {CATEGORY_LABELS.get(category, category)} — "
+                            f"`{ctx['source']}` · page {ctx['page']} · relevance {ctx['score']:.3f}"
                         )
+                        st.caption(ctx["text"][:400] + ("..." if len(ctx["text"]) > 400 else ""))
 
     if st.session_state.pending_prompt:
         prompt = st.session_state.pending_prompt
         st.session_state.pending_prompt = None
         _run_query(prompt, top_k=top_k, max_distance=max_distance)
-    elif prompt := st.chat_input("Ask a compliance or earnings question..."):
+    elif prompt := st.chat_input("Ask about regulations, annual reports, insurance rules, or analyst exams..."):
         _run_query(prompt, top_k=top_k, max_distance=max_distance)
 
-with docs_col:
-    st.subheader("Document Management")
-    manifest_map: dict[str, dict] = {}
-    manifest_path = RAW_PDF_DIR / "earnings_manifest.json"
-    if manifest_path.exists():
-        try:
-            payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-            manifest_map = {d.get("filename", ""): d for d in payload.get("downloads", [])}
-        except Exception:
-            manifest_map = {}
-
-    pdf_files = sorted(RAW_PDF_DIR.glob("*.pdf"))
-    collection = get_or_create_collection(get_chroma_client())
-    rows = collection.get(include=["metadatas"])
-    counts: dict[str, int] = {}
-    for md in rows.get("metadatas", []):
-        if not md:
-            continue
-        source = str(md.get("source", ""))
-        counts[source] = counts.get(source, 0) + 1
-
-    compliance_names, earnings_names = classify_pdf_names(RAW_PDF_DIR)
-    st.caption(f"Compliance: **{len(compliance_names)}** | Earnings: **{len(earnings_names)}**")
-
-    docs_data = []
-    for pdf_file in pdf_files:
-        chunk_count = counts.get(pdf_file.name, 0)
-        vertical = _vertical_for_filename(pdf_file.name, manifest_map)
-        docs_data.append(
-            {
-                "Vertical": vertical,
-                "Document": pdf_file.name,
-                "SizeMB": round(pdf_file.stat().st_size / (1024 * 1024), 2),
-                "IndexedChunks": chunk_count,
-                "Status": "Indexed" if chunk_count > 0 else "Pending",
-            }
-        )
-    if docs_data:
-        st.dataframe(docs_data, use_container_width=True, hide_index=True)
-    else:
-        st.info("No PDFs found in data/raw_pdfs.")
-
-    with st.expander("Refresh corpus (offline)"):
-        st.code(
-            "python scripts/scrape_latest_quarterly_pdfs.py\n"
-            "python scripts/backfill_current_fy_quarterly_pdfs.py\n"
-            "python scripts/refresh_dual_vertical_index.py",
-            language="powershell",
-        )
+with tab_library:
+    st.markdown(
+        "Your indexed document library. All answers are retrieved from these PDFs with page citations."
+    )
+    _render_knowledge_base()

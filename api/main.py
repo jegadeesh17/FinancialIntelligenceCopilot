@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from collections import defaultdict, deque
+from time import time
+
+from fastapi import FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from src.config import get_settings
@@ -14,9 +17,11 @@ from src.vectorstore import get_collection_count
 
 app = FastAPI(
     title="Financial Intelligence Copilot API",
-    description="Citation-grounded Q&A over compliance and earnings PDF corpus.",
+    description="Citation-grounded Q&A over regulatory, annual report, insurance, and exam PDF corpus.",
     version="1.0.0",
 )
+_REQUEST_WINDOW_SECONDS = 60
+_request_buckets: dict[str, deque[float]] = defaultdict(deque)
 
 
 class AskRequest(BaseModel):
@@ -33,11 +38,9 @@ class SourceChunkOut(BaseModel):
     page: int
     text: str
     score: float
-    source_url: str = ""
     retrieved_at: str = ""
     regulator: str = "other"
-    company: str = ""
-    document_vertical: str = "compliance"
+    document_category: str = "annual_report"
 
 
 class AskResponse(BaseModel):
@@ -63,7 +66,20 @@ def health() -> dict:
 
 
 @app.post("/ask", response_model=AskResponse)
-def ask(req: AskRequest) -> AskResponse:
+def ask(req: AskRequest, request: Request, x_api_key: str | None = Header(default=None)) -> AskResponse:
+    settings = get_settings()
+    if settings.api_key and x_api_key != settings.api_key:
+        raise HTTPException(status_code=401, detail="Invalid API key.")
+
+    client_ip = request.client.host if request.client else "unknown"
+    now = time()
+    bucket = _request_buckets[client_ip]
+    while bucket and now - bucket[0] > _REQUEST_WINDOW_SECONDS:
+        bucket.popleft()
+    if len(bucket) >= settings.api_rate_limit_per_minute:
+        raise HTTPException(status_code=429, detail="Rate limit exceeded. Try again in a minute.")
+    bucket.append(now)
+
     question = req.question.strip()
     if not question:
         raise HTTPException(status_code=422, detail="Question must not be empty.")
@@ -85,11 +101,9 @@ def ask(req: AskRequest) -> AskResponse:
                 page=item.page,
                 text=item.text[:500],
                 score=item.score,
-                source_url=item.source_url,
                 retrieved_at=item.retrieved_at,
                 regulator=item.regulator,
-                company=item.company,
-                document_vertical=item.document_vertical,
+                document_category=item.document_category,
             )
             for item in contexts[:5]
         ],

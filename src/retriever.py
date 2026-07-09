@@ -46,6 +46,9 @@ def retrieve(
         if max_distance is not None and float(distance) > max_distance:
             continue
         md = metadata or {}
+        category = md.get("document_category") or md.get("document_vertical", "annual_report")
+        if category == "compliance":
+            category = "annual_report"
         results.append(
             RetrievalResult(
                 source=str(md.get("source", "")),
@@ -53,11 +56,9 @@ def retrieve(
                 chunk_index=int(md.get("chunk_index", 0)),
                 text=text,
                 score=float(distance),
-                source_url=str(md.get("source_url", "")),
                 retrieved_at=str(md.get("retrieved_at", "")),
                 regulator=str(md.get("regulator", "other")),
-                company=str(md.get("company", "")),
-                document_vertical=str(md.get("document_vertical", "compliance")),
+                document_category=str(category),
             )
         )
     return results

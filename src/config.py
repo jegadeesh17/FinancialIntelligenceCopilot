@@ -23,6 +23,10 @@ class Settings(BaseSettings):
         description="Model slug on OpenRouter",
     )
     llm_max_retries: int = Field(default=3, ge=1, le=5)
+    openrouter_fallback_models: str = Field(
+        default="",
+        description="Comma-separated fallback OpenRouter model slugs.",
+    )
 
     chroma_persist_dir: str = Field(
         default="data/chroma_db",
@@ -45,6 +49,13 @@ class Settings(BaseSettings):
         le=2.0,
         description="If best retrieval distance is above this threshold, flag low confidence.",
     )
+    api_key: str = Field(default="", description="Optional API key for FastAPI endpoints.")
+    api_rate_limit_per_minute: int = Field(
+        default=60,
+        ge=1,
+        le=1000,
+        description="Max API requests per minute per IP for /ask.",
+    )
 
     @field_validator("chunk_overlap")
     @classmethod
@@ -53,6 +64,10 @@ class Settings(BaseSettings):
         if v >= chunk_size:
             raise ValueError("chunk_overlap must be smaller than chunk_size")
         return v
+
+    @property
+    def fallback_models(self) -> list[str]:
+        return [m.strip() for m in self.openrouter_fallback_models.split(",") if m.strip()]
 
     @property
     def chroma_path(self) -> Path:

@@ -46,13 +46,13 @@ DOCUMENTS: list[dict[str, str]] = [
         "url": (
             "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566"
         ),
-        "note": "RBI Master Direction — AML/CFT (fallback: scripts/seed_extra_pdfs.py)",
+        "note": "RBI Master Direction — AML/CFT (download manually if URL fails)",
         "optional": True,
     },
     {
         "filename": "sebi_lodr_governance.pdf",
         "url": "https://www.sebi.gov.in/legal/circulars/2023/aug/corporate-governance-disclosures.pdf",
-        "note": "SEBI LODR governance circular (fallback: scripts/seed_extra_pdfs.py)",
+        "note": "SEBI LODR governance circular (download manually if URL fails)",
         "optional": True,
     },
 ]

@@ -24,7 +24,7 @@ class TestChatHelpers:
     def test_format_citations_empty(self):
         from src.chat import format_citations
 
-        assert format_citations([]) == "Sources: none"
+        assert format_citations([]) == ""
 
     def test_format_citations_groups_pages(self):
         from src.chat import format_citations
@@ -36,7 +36,7 @@ class TestChatHelpers:
                 Citation(source="rbi.pdf", page=14),
             ]
         )
-        assert "rbi.pdf (p.12,14)" in text
+        assert "rbi.pdf (p.12, p.14)" in text
 
 
 class TestRagPipeline:

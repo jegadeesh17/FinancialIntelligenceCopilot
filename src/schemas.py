@@ -14,13 +14,11 @@ class DocumentChunk(BaseModel):
         ge=0,
         description="0-based chunk index within the source document",
     )
-    source_url: str = Field(default="", description="Original source URL if available")
-    retrieved_at: str = Field(default="", description="Ingestion/download timestamp (ISO)")
-    regulator: str = Field(default="other", description="Regulator tag: RBI, SEBI, or other")
-    company: str = Field(default="", description="Associated company ticker/symbol if available")
-    document_vertical: str = Field(
-        default="compliance",
-        description="Document group such as compliance or earnings",
+    retrieved_at: str = Field(default="", description="Ingestion timestamp (ISO)")
+    regulator: str = Field(default="other", description="Regulator tag: RBI, SEBI, IRDAI, or other")
+    document_category: str = Field(
+        default="annual_report",
+        description="Document category: regulatory, annual_report, insurance, exam_reference",
     )
 
 
@@ -32,11 +30,9 @@ class RetrievalResult(BaseModel):
     text: str = Field(..., min_length=1)
     chunk_index: int = Field(default=0, ge=0)
     score: float = Field(..., description="Distance score from vector search")
-    source_url: str = Field(default="")
     retrieved_at: str = Field(default="")
     regulator: str = Field(default="other")
-    company: str = Field(default="")
-    document_vertical: str = Field(default="compliance")
+    document_category: str = Field(default="annual_report")
 
 
 class Citation(BaseModel):

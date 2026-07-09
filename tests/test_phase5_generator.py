@@ -65,8 +65,8 @@ class TestGenerator:
     def test_generate_answer_with_mocked_llm(self, contexts, settings, monkeypatch):
         from src.generator import generate_answer
 
-        def fake_call(_prompt, settings):  # noqa: ARG001
-            return "KYC requires proof of identity and address."
+        def fake_call(_prompt, settings, model_slug):  # noqa: ARG001
+            return "KYC requires proof of identity and address.", model_slug
 
         monkeypatch.setattr("src.generator._call_openrouter", fake_call)
         result = generate_answer("What are KYC requirements?", contexts, settings=settings)

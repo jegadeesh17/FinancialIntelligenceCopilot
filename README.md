@@ -1,7 +1,7 @@
 # Financial Intelligence Copilot
 ---
 ### **Project Overview**
-**Financial Intelligence Copilot** is a dual-vertical Retrieval-Augmented Generation system for BFSI document intelligence. It ingests regulatory PDFs (RBI, SEBI) and quarterly earnings filings, embeds them into ChromaDB, and answers analyst questions via OpenRouter with **mandatory page-level source citations** and retrieval confidence signals.
+**Financial Intelligence Copilot** is a Retrieval-Augmented Generation system for BFSI document intelligence. It ingests manually curated PDFs (regulatory circulars, annual reports, insurance guidelines, exam reference material), embeds them into ChromaDB, and answers questions via OpenRouter with **page-level citations** and retrieval confidence signals.
 
 **Interview pitch:** *"I built Financial Intelligence Copilot — a dual-vertical RAG system that answers compliance and earnings questions from RBI/SEBI circulars and quarterly-result PDFs, with ChromaDB retrieval, confidence gating, and auditable page-level citations."*
 
@@ -21,11 +21,10 @@
 
 ---
 ### **Dataset**
-- **Corpus:** Compliance-first mixed — ~40% regulatory circulars, ~40% annual reports/10-K, ~20% insurance guidelines
-- **Initial PDFs (Phase 2–3):** 1 RBI circular + 1 HDFC Bank annual report + 1 SEBI circular
-- **Full target:** 15–20 PDFs by Phase 6
+- **Foundation corpus (11 PDFs):** 4 regulatory + 5 annual reports + 2 IRDAI insurance circulars
+- **Annual reports (finalized):** HDFC Bank, ICICI Bank, Reliance Industries, Tata Consumer Products, TCS
 - **Storage:** `data/raw_pdfs/` (gitignored), vectors in `data/chroma_db/` (gitignored)
-- **PDF sources:** [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)
+- **Manual PDF guide:** [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md)
 
 **Sample questions:**
 - *"What is the minimum capital requirement in the RBI master direction?"*
@@ -83,7 +82,7 @@ Full spec: [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)
 cd FinancialIntelligenceCopilot
 pip install -r requirements.txt
 cp .env.example .env   # add OPENROUTER_API_KEY
-python scripts/download_docs.py; python scripts/seed_extra_pdfs.py; python scripts/build_index.py
+python scripts/build_index.py
 streamlit run app/app.py
 ```
 
@@ -91,6 +90,8 @@ streamlit run app/app.py
 ```powershell
 uvicorn api.main:app --port 8000
 ```
+
+If `API_KEY` is set in `.env`, call `/ask` with header `x-api-key: <your-key>`.
 
 **Retrieval evaluation:**
 ```powershell
@@ -105,38 +106,13 @@ python scripts/eval_retrieval.py
 - Target: ≥ 70% retrieval hit rate
 
 ---
-### **Dual Vertical Expansion (Compliance + Earnings)**
-- Top-5 NIFTY50 watchlist scraping for quarterly-result PDFs (Moneycontrol discovery)
-- Backfill current FY quarterly filings for coverage depth
-- Lightweight market snapshot (headline sentiment + basic fundamentals)
-- Corpus mix check before indexing (compliance vs earnings balance)
-
-```powershell
-# 1) Latest quarterly-result scrape (top 5 NIFTY companies)
-python scripts/scrape_latest_quarterly_pdfs.py
-
-# 2) Backfill current financial-year quarterly filings
-python scripts/backfill_current_fy_quarterly_pdfs.py
-
-# 3) Optional market sentiment/fundamental snapshot
-python scripts/scrape_market_sentiment.py
-
-# 4) Validate corpus balance and rebuild vector index
-python scripts/refresh_dual_vertical_index.py
-```
-
-Notes:
-- `data/raw_pdfs/earnings_manifest.json` tracks scraped earnings PDFs.
-- Quarterly scrapers rely on live page structure; if scrape misses links, add PDF URLs manually in the manifest and rerun index refresh.
-
----
 ### **Demo Script**
 See [docs/DEMO.md](docs/DEMO.md) for a 5-minute interview demo flow.
 
 **Quick demo loop:**
-1. Ask a compliance question in Streamlit (or use sample button).
-2. If confidence is LOW, run `python scripts/refresh_dual_vertical_index.py`.
-3. Ask an earnings question and verify citations + vertical mix in sidebar.
+1. Run `python scripts/build_index.py` after adding PDFs to `data/raw_pdfs/`.
+2. Ask a regulatory, annual report, or exam-reference question in Streamlit.
+3. Use source excerpts in debug mode to validate retrieved context quality.
 
 ---
 ```powershell
@@ -158,7 +134,7 @@ docker compose up --build
 | PDF parsing | PyMuPDF |
 | Embeddings | `sentence-transformers/all-MiniLM-L6-v2` (CPU) |
 | Vector DB | ChromaDB |
-| LLM | OpenRouter (`openrouter/free`) |
+| LLM | OpenRouter (primary + optional fallback chain) |
 | Frontend | Streamlit |
 | Config | Pydantic Settings |
 | Tests | pytest |

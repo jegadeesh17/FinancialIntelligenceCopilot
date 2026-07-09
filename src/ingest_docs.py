@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,47 +9,19 @@ from pathlib import Path
 import fitz
 
 from src.config import Settings, get_settings
+from src.corpus_stats import classify_document_category, infer_regulator
 from src.schemas import DocumentChunk
 
 _PARAGRAPH_BREAK = re.compile(r"\n\s*\n+")
 
 
-def _load_earnings_manifest(pdf_dir: Path) -> dict[str, dict]:
-    manifest_path = pdf_dir / "earnings_manifest.json"
-    if not manifest_path.exists():
-        return {}
-    try:
-        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
-    out: dict[str, dict] = {}
-    for item in payload.get("downloads", []):
-        name = str(item.get("filename", "")).strip()
-        if name:
-            out[name] = item
-    return out
-
-
-def _infer_regulator(filename: str) -> str:
-    lower = filename.lower()
-    if "rbi" in lower:
-        return "RBI"
-    if "sebi" in lower:
-        return "SEBI"
-    return "other"
-
-
-def _source_metadata_for_file(source: str, manifest_map: dict[str, dict]) -> dict[str, str]:
-    row = manifest_map.get(source, {})
-    is_earnings = source.startswith("earnings_") or row.get("vertical") == "earnings"
+def _metadata_for_file(filename: str) -> dict[str, str]:
+    category = classify_document_category(filename)
+    regulator = infer_regulator(filename, category)
     return {
-        "source_url": str(row.get("source_url", "")),
-        "retrieved_at": str(
-            row.get("retrieved_at", datetime.now(timezone.utc).isoformat())
-        ),
-        "regulator": str(row.get("regulator", _infer_regulator(source))),
-        "company": str(row.get("symbol", row.get("company_name", ""))),
-        "document_vertical": "earnings" if is_earnings else "compliance",
+        "document_category": category,
+        "regulator": regulator,
+        "retrieved_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
@@ -155,7 +126,7 @@ def ingest_pdf(
     settings = settings or get_settings()
     source = Path(pdf_path).name
     pages = extract_pages(pdf_path)
-    source_metadata = source_metadata or {}
+    meta = source_metadata or _metadata_for_file(source)
 
     chunks: list[DocumentChunk] = []
     chunk_index = 0
@@ -171,11 +142,9 @@ def ingest_pdf(
                     page=page_num,
                     text=text,
                     chunk_index=chunk_index,
-                    source_url=source_metadata.get("source_url", ""),
-                    retrieved_at=source_metadata.get("retrieved_at", ""),
-                    regulator=source_metadata.get("regulator", "other"),
-                    company=source_metadata.get("company", ""),
-                    document_vertical=source_metadata.get("document_vertical", "compliance"),
+                    retrieved_at=meta.get("retrieved_at", ""),
+                    regulator=meta.get("regulator", "other"),
+                    document_category=meta.get("document_category", "annual_report"),
                 )
             )
             chunk_index += 1
@@ -192,10 +161,8 @@ def ingest_directory(
     pdf_dir = Path(pdf_dir)
     if not pdf_dir.exists():
         raise FileNotFoundError(f"PDF directory not found: {pdf_dir}")
-    manifest_map = _load_earnings_manifest(pdf_dir)
 
     all_chunks: list[DocumentChunk] = []
     for pdf_path in sorted(pdf_dir.glob("*.pdf")):
-        metadata = _source_metadata_for_file(pdf_path.name, manifest_map)
-        all_chunks.extend(ingest_pdf(pdf_path, settings=settings, source_metadata=metadata))
+        all_chunks.extend(ingest_pdf(pdf_path, settings=settings))
     return all_chunks

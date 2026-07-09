@@ -224,20 +224,18 @@ pytest tests/test_phase7_docker.py -v
 
 ---
 
-## Phase 8 — Dual-Vertical Scraping & Corpus Ops
+## Phase 8 — Corpus Ops (Legacy Notes)
 
 **Completed:** 2026-07-09
 
 ### What we built
-- `scripts/nifty50_top5_config.py` — shared top-5 NIFTY watchlist
 - `scripts/scrape_latest_quarterly_pdfs.py` — scrape/discover latest quarterly-result PDFs
 - `scripts/backfill_current_fy_quarterly_pdfs.py` — current financial-year backfill per company
-- `scripts/scrape_market_sentiment.py` — lightweight sentiment/fundamental snapshot
 - `scripts/refresh_dual_vertical_index.py` — corpus ratio checks + index rebuild
 - `requirements.txt` update — `beautifulsoup4`
 
 ### Concepts
-- **Discovery vs source authority:** Moneycontrol is used for discovery; PDFs remain the source of truth for RAG ingestion
+- **Source authority:** official PDFs remain the source of truth for RAG ingestion
 - **Batch-first refresh:** corpus updates happen offline, not during `/ask`
 - **Portfolio practicality:** enough automation for demos without scheduler/service sprawl
 
@@ -247,7 +245,6 @@ pytest tests/test_phase7_docker.py -v
 ```powershell
 python scripts/scrape_latest_quarterly_pdfs.py
 python scripts/backfill_current_fy_quarterly_pdfs.py
-python scripts/scrape_market_sentiment.py
 python scripts/refresh_dual_vertical_index.py
 ```
 

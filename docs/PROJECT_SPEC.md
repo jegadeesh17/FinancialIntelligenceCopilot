@@ -45,10 +45,10 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | 6 | Streamlit chat UI with citation display (doc name + page) |
 | 7 | Docker containerization |
 | 8 | Per-phase pytest checkpoint tests |
-| 9 | Top-5 NIFTY watchlist scraping for quarterly-result PDFs |
+| 9 | Quarterly-result PDF discovery workflow (manual-first, source-validated) |
 | 10 | Current FY backfill scraping and manifest dedup tracking |
 | 11 | Corpus ratio health checks for compliance vs earnings mix |
-| 12 | Market snapshot extraction (headline sentiment + fundamentals) |
+| 12 | Corpus telemetry and confidence-oriented UX signals |
 
 ### 2.2 Out of Scope
 

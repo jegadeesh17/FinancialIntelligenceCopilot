@@ -1,44 +1,58 @@
 # PDF Data Sources — Financial Intelligence Copilot
 
-This document lists the **initial 3 PDFs** and how to obtain them. PDFs are stored in `data/raw_pdfs/` (gitignored).
+All PDFs are stored manually in `data/raw_pdfs/` (gitignored). **Only use real PDFs from official sites.**
+
+## Workflow
+
+```bash
+# 1) Add PDFs manually to data/raw_pdfs/
+# 2) Build Chroma index
+python scripts/build_index.py
+
+# 3) Run UI
+streamlit run app/app.py
+```
 
 ---
 
-## Initial corpus (Phase 2)
+## Finalized corpus (12 PDFs)
 
-| # | Type | Document | Where to get it | Filename suggestion |
-|---|------|----------|-----------------|---------------------|
-| 1 | **Regulatory** | RBI Master Direction on KYC | [Direct PDF](https://www.rbi.org.in/commonman/Upload/English/Notification/PDFs/MD18KYCF6E92C82E1E1419D87323E3869BC9F13.pdf) | `rbi_master_direction_kyc.pdf` |
-| 2 | **Annual report** | HDFC Bank Integrated Annual Report FY2023-24 | [HDFC IR — Annual Reports](https://www.hdfcbank.com/personal/about-us/investor-relations/annual-reports) | `hdfc_bank_annual_report.pdf` |
-| 3 | **Regulatory** | SEBI LODR circular (BRR / disclosure) | [Direct PDF](https://www.sebi.gov.in/sebi_data/attachdocs/1486375066836.pdf) | `sebi_circular_disclosure.pdf` |
+### Annual reports (5)
 
----
+| Filename | Company |
+|----------|---------|
+| `hdfc_bank_annual_report.pdf` | HDFC Bank |
+| `icici_bank_annual_report.pdf` | ICICI Bank |
+| `RIL-Integrated-Annual-Report-2025-26.pdf` | Reliance Industries |
+| `Tata Consumer Products Ltd IAR 2025-2026.pdf` | Tata Consumer Products |
+| `tcs_annual_report.pdf` | TCS |
 
-## Do you have to find them manually?
+### Regulatory — RBI + SEBI (4)
 
-**Phase 2:** We will add `scripts/download_docs.py` with **direct PDF URLs** where stable. For RBI/SEBI/HDFC, sites sometimes change links — you may need to:
+| Filename | Source |
+|----------|--------|
+| `rbi_master_direction_kyc.pdf` | RBI — KYC / AML/CFT Master Direction |
+| `rbi_master_direction_fraud_reporting.pdf` | RBI — Fraud classification & reporting |
+| `sebi_circular_disclosure.pdf` | SEBI — integrated reporting / BRR disclosure |
+| `sebi_lodr_ncd_operational_circular.pdf` | SEBI — LODR for NCD / securitized debt |
 
-1. **Preferred:** Run `python scripts/download_docs.py` (Phase 2) — auto-downloads when URLs work.
-2. **Fallback:** Download the 3 PDFs manually from the links above, save to `data/raw_pdfs/` using the filenames in the table.
+### Insurance — IRDAI (2)
 
-**You do not need all 15–20 PDFs now** — only these 3 for Phases 2–5. We grow the corpus in Phase 6.
+| Filename | Source |
+|----------|--------|
+| `irdai_life_insurance_products.pdf` | IRDAI — life insurance products master circular |
+| `irdai_investment_master_circular.pdf` | IRDAI — investment master circular |
 
----
+### Exam reference (1)
 
-## Full corpus target (Phase 6) — document types
-
-| Class | ~Share | Examples |
-|-------|--------|----------|
-| Regulatory circulars | 40% | RBI Master Directions, SEBI circulars |
-| Annual reports | 40% | HDFC Bank, Reliance Industries annual reports |
-| Insurance guidelines | 20% | IRDAI master circulars |
-
-All documents must be **text-based PDFs** (not scanned images). OCR is out of scope for v1.
+| Filename | Source |
+|----------|--------|
+| `nism_research_analyst_workbook.pdf` | NISM Series XV Research Analyst workbook |
 
 ---
 
 ## Requirements
 
-- Text-selectable PDFs (copy/paste works in a PDF reader)
-- English language
-- Publicly available (no paywall or login)
+- Text-selectable PDFs (copy/paste works)
+- English, publicly available
+- No automated PDF seeding scripts

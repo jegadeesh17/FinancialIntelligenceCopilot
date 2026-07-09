@@ -7,8 +7,10 @@ import streamlit as st
 from src.schemas import Citation
 
 WELCOME_MESSAGE = (
-    "Hello! Ask me about RBI/SEBI regulations or financial report disclosures. "
-    "I will answer with source citations."
+    "Welcome to **Financial Intelligence Copilot**. "
+    "Ask questions about RBI/SEBI regulations, listed company annual reports, "
+    "IRDAI insurance circulars, or NISM research analyst material — "
+    "every answer is grounded in your document library with page citations."
 )
 
 
@@ -29,7 +31,7 @@ def append_message(role: str, content: str, citations: list[Citation] | list[dic
 
 def format_citations(citations: list[Citation] | list[dict]) -> str:
     if not citations:
-        return "Sources: none"
+        return ""
     grouped: dict[str, set[int]] = {}
     for c in citations:
         source = c.source if hasattr(c, "source") else c.get("source", "")
@@ -39,8 +41,16 @@ def format_citations(citations: list[Citation] | list[dict]) -> str:
     parts = []
     for source, pages in grouped.items():
         ordered = sorted(p for p in pages if p > 0)
-        page_text = ",".join(str(p) for p in ordered[:5])
+        page_text = ", ".join(f"p.{p}" for p in ordered[:5])
         if len(ordered) > 5:
-            page_text += ",..."
-        parts.append(f"{source} (p.{page_text})")
-    return "Sources: " + " | ".join(parts)
+            page_text += ", ..."
+        short = source if len(source) <= 42 else source[:39] + "..."
+        parts.append(f"{short} ({page_text})")
+    return " · ".join(parts)
+
+
+def citations_html(citations: list[Citation] | list[dict]) -> str:
+    """Backward-compatible alias for UI citation chips."""
+    from src.ui_styles import citation_chips_html
+
+    return citation_chips_html(citations)

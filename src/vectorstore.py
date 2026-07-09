@@ -64,11 +64,9 @@ def upsert_chunks(
                 "source": chunk.source,
                 "page": chunk.page,
                 "chunk_index": chunk.chunk_index,
-                "source_url": chunk.source_url,
                 "retrieved_at": chunk.retrieved_at,
                 "regulator": chunk.regulator,
-                "company": chunk.company,
-                "document_vertical": chunk.document_vertical,
+                "document_category": chunk.document_category,
             }
             for chunk in batch
         ]
@@ -103,6 +101,10 @@ def build_vector_index(
     target_dir = pdf_dir or settings.raw_pdf_path
     chunks = ingest_directory(directory=target_dir, settings=settings)
     client = get_chroma_client(settings=settings)
+    try:
+        client.delete_collection(name=collection_name)
+    except Exception:
+        pass
     stored = upsert_chunks(
         chunks,
         client=client,
