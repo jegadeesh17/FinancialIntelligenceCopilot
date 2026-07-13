@@ -313,11 +313,13 @@ with tab_copilot:
                         )
                         st.caption(ctx["text"][:400] + ("..." if len(ctx["text"]) > 400 else ""))
 
+    prompt = st.chat_input("Ask about regulations, annual reports, insurance rules, or analyst exams...")
+
     if st.session_state.pending_prompt:
-        prompt = st.session_state.pending_prompt
+        pending = st.session_state.pending_prompt
         st.session_state.pending_prompt = None
-        _run_query(prompt, top_k=top_k, max_distance=max_distance)
-    elif prompt := st.chat_input("Ask about regulations, annual reports, insurance rules, or analyst exams..."):
+        _run_query(pending, top_k=top_k, max_distance=max_distance)
+    elif prompt:
         _run_query(prompt, top_k=top_k, max_distance=max_distance)
 
 with tab_library:
