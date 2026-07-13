@@ -13,6 +13,21 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+def _extract_index_if_needed():
+    import zipfile
+    db_dir = PROJECT_ROOT / "data" / "chroma_db"
+    db_file = db_dir / "chroma.sqlite3"
+    zip_path = PROJECT_ROOT / "data" / "chroma_db_lzma.zip"
+    
+    if zip_path.exists() and not db_file.exists():
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                zip_ref.extractall(PROJECT_ROOT / "data" / "chroma_db")
+        except Exception:
+            pass
+
+_extract_index_if_needed()
+
 
 def _load_ui_styles():
     """Load UI constants from disk (avoids Streamlit stale import cache)."""
@@ -103,13 +118,12 @@ def _indexed_chunk_counts() -> dict[str, int]:
 
 
 def _render_knowledge_base() -> None:
-    pdf_files = sorted(RAW_PDF_DIR.glob("*.pdf"))
-    if not pdf_files:
+    counts = _indexed_chunk_counts()
+    by_category = list_pdfs_by_category(RAW_PDF_DIR, indexed_sources=list(counts.keys()))
+
+    if not by_category:
         st.info("Your knowledge base is empty. Add PDFs to `data/raw_pdfs/` and rebuild the index.")
         return
-
-    counts = _indexed_chunk_counts()
-    by_category = list_pdfs_by_category(RAW_PDF_DIR)
 
     for category, names in by_category.items():
         label = CATEGORY_LABELS.get(category, category.replace("_", " ").title())
@@ -117,13 +131,17 @@ def _render_knowledge_base() -> None:
         for name in names:
             pdf_path = RAW_PDF_DIR / name
             chunk_count = counts.get(name, 0)
-            size_mb = pdf_path.stat().st_size / (1024 * 1024)
+            if pdf_path.exists():
+                size_mb = pdf_path.stat().st_size / (1024 * 1024)
+                size_str = f"{size_mb:.1f} MB"
+            else:
+                size_str = "Pre-indexed"
             status = "Indexed" if chunk_count else "Pending"
             rows_html.append(
                 f"""
                 <div class="fic-doc-row">
                     <div class="fic-doc-name">{name}</div>
-                    <div class="fic-doc-meta">{size_mb:.1f} MB · {chunk_count} chunks · {status}</div>
+                    <div class="fic-doc-meta">{size_str} · {chunk_count} chunks · {status}</div>
                 </div>
                 """
             )
@@ -195,11 +213,13 @@ def _run_query(prompt: str, top_k: int, max_distance: float) -> None:
 # --- Page bootstrap ---
 st.markdown(PRODUCT_CSS, unsafe_allow_html=True)
 
-corpus_stats = summarize_corpus(RAW_PDF_DIR)
 try:
     vector_count = get_collection_count()
+    indexed_counts = _indexed_chunk_counts()
 except Exception:
     vector_count = 0
+    indexed_counts = {}
+corpus_stats = summarize_corpus(RAW_PDF_DIR, indexed_sources=list(indexed_counts.keys()))
 meta = read_index_metadata()
 
 init_chat_state()

@@ -1,25 +1,25 @@
 # Phase 1 — core
-python-dotenv==1.0.1
-pydantic==2.10.3
-pydantic-settings==2.6.1
+python-dotenv>=1.0.1
+pydantic>=2.10.3
+pydantic-settings>=2.6.1
 
 # Phase 2 — document ingestion
-pymupdf==1.25.1
+pymupdf>=1.25.1
 
 # Phase 3 — embeddings & vector store
 sentence-transformers>=3.3.1
 chromadb>=1.5.9
 
 # Phase 5 — LLM generation
-httpx==0.28.1
+httpx>=0.28.1
 beautifulsoup4
 
 # Phase 6 — chat UI
-streamlit==1.40.2
+streamlit>=1.40.2
 
 # Portfolio API layer
-fastapi==0.115.6
-uvicorn==0.32.1
+fastapi>=0.115.6
+uvicorn>=0.32.1
 
 # Dev / testing
-pytest==8.3.4
+pytest>=8.3.4

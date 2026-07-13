@@ -31,16 +31,19 @@ def infer_regulator(filename: str, category: str) -> str:
     return "other"
 
 
-def summarize_corpus(raw_pdf_dir: Path) -> dict:
+def summarize_corpus(raw_pdf_dir: Path, indexed_sources: list[str] | None = None) -> dict:
     """Return corpus stats grouped by document category."""
-    pdfs = sorted(raw_pdf_dir.glob("*.pdf"))
+    pdfs = [p.name for p in raw_pdf_dir.glob("*.pdf")]
+    if indexed_sources:
+        pdfs = list(set(pdfs + indexed_sources))
+    pdfs.sort()
     category_counts: dict[str, int] = {c: 0 for c in DOCUMENT_CATEGORIES}
     regulator_counts: dict[str, int] = {}
 
-    for pdf in pdfs:
-        category = classify_document_category(pdf.name)
+    for pdf_name in pdfs:
+        category = classify_document_category(pdf_name)
         category_counts[category] = category_counts.get(category, 0) + 1
-        regulator = infer_regulator(pdf.name, category)
+        regulator = infer_regulator(pdf_name, category)
         if regulator != "other":
             regulator_counts[regulator] = regulator_counts.get(regulator, 0) + 1
 
@@ -58,9 +61,14 @@ def summarize_corpus(raw_pdf_dir: Path) -> dict:
     }
 
 
-def list_pdfs_by_category(raw_pdf_dir: Path) -> dict[str, list[str]]:
+def list_pdfs_by_category(raw_pdf_dir: Path, indexed_sources: list[str] | None = None) -> dict[str, list[str]]:
     """Return filenames grouped by document category."""
     grouped: dict[str, list[str]] = {c: [] for c in DOCUMENT_CATEGORIES}
-    for pdf in sorted(raw_pdf_dir.glob("*.pdf")):
-        grouped[classify_document_category(pdf.name)].append(pdf.name)
+    pdfs = [p.name for p in raw_pdf_dir.glob("*.pdf")]
+    if indexed_sources:
+        pdfs = list(set(pdfs + indexed_sources))
+    pdfs.sort()
+    
+    for pdf_name in pdfs:
+        grouped[classify_document_category(pdf_name)].append(pdf_name)
     return {k: v for k, v in grouped.items() if v}
