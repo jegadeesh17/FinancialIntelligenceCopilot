@@ -293,34 +293,39 @@ with tab_copilot:
 
     st.markdown("")
 
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            if msg["role"] == "assistant" and "low_confidence" in msg:
-                st.markdown(_confidence_html(bool(msg.get("low_confidence"))), unsafe_allow_html=True)
-            st.markdown(msg["content"])
-            if msg["role"] == "assistant" and msg.get("citations"):
-                st.markdown(
-                    f'<div style="margin-top:0.5rem;">{citation_chips_html(msg.get("citations", []))}</div>',
-                    unsafe_allow_html=True,
-                )
-            if msg["role"] == "assistant" and show_debug and msg.get("contexts"):
-                with st.expander("Source excerpts"):
-                    for i, ctx in enumerate(msg["contexts"], start=1):
-                        category = ctx.get("document_category", "annual_report")
-                        st.markdown(
-                            f"**{i}.** {CATEGORY_LABELS.get(category, category)} — "
-                            f"`{ctx['source']}` · page {ctx['page']} · relevance {ctx['score']:.3f}"
-                        )
-                        st.caption(ctx["text"][:400] + ("..." if len(ctx["text"]) > 400 else ""))
+    chat_container = st.container()
+
+    with chat_container:
+        for msg in st.session_state.messages:
+            with st.chat_message(msg["role"]):
+                if msg["role"] == "assistant" and "low_confidence" in msg:
+                    st.markdown(_confidence_html(bool(msg.get("low_confidence"))), unsafe_allow_html=True)
+                st.markdown(msg["content"])
+                if msg["role"] == "assistant" and msg.get("citations"):
+                    st.markdown(
+                        f'<div style="margin-top:0.5rem;">{citation_chips_html(msg.get("citations", []))}</div>',
+                        unsafe_allow_html=True,
+                    )
+                if msg["role"] == "assistant" and show_debug and msg.get("contexts"):
+                    with st.expander("Source excerpts"):
+                        for i, ctx in enumerate(msg["contexts"], start=1):
+                            category = ctx.get("document_category", "annual_report")
+                            st.markdown(
+                                f"**{i}.** {CATEGORY_LABELS.get(category, category)} — "
+                                f"`{ctx['source']}` · page {ctx['page']} · relevance {ctx['score']:.3f}"
+                            )
+                            st.caption(ctx["text"][:400] + ("..." if len(ctx["text"]) > 400 else ""))
 
     prompt = st.chat_input("Ask about regulations, annual reports, insurance rules, or analyst exams...")
 
     if st.session_state.pending_prompt:
         pending = st.session_state.pending_prompt
         st.session_state.pending_prompt = None
-        _run_query(pending, top_k=top_k, max_distance=max_distance)
+        with chat_container:
+            _run_query(pending, top_k=top_k, max_distance=max_distance)
     elif prompt:
-        _run_query(prompt, top_k=top_k, max_distance=max_distance)
+        with chat_container:
+            _run_query(prompt, top_k=top_k, max_distance=max_distance)
 
 with tab_library:
     st.markdown(
