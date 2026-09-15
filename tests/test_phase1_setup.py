@@ -79,7 +79,7 @@ class TestConfig:
             importlib.reload(sys.modules["src.config"])
         from src.config import Settings
 
-        settings = Settings()
+        settings = Settings(_env_file=None)
         assert settings.llm_provider == "openrouter"
         assert settings.openrouter_model == "openrouter/free"
         assert settings.embedding_model == "sentence-transformers/all-MiniLM-L6-v2"

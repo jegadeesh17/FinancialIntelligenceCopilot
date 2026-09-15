@@ -8,15 +8,13 @@ data/*
 !data/.keep
 !data/eval_questions.json
 
-# Un-ignore the PDFs so the app can list them in the UI
+# Raw PDFs are stored locally or in object store
 !data/raw_pdfs/
 data/raw_pdfs/*
 !data/raw_pdfs/.keep
-!data/raw_pdfs/*.pdf
 
-# Allow the built database files to be pushed
-!data/chroma_db/
-!data/chroma_db/*
+# Ignore chroma database files (too large for GitHub)
+data/chroma_db/
 
 models/*
 !models/.keep

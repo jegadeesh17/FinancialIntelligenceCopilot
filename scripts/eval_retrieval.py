@@ -29,7 +29,7 @@ def _page_in_range(page: int, page_min: int, page_max: int) -> bool:
     return page_min <= page <= page_max
 
 
-def evaluate(top_k: int = 5) -> dict:
+def evaluate(top_k: int = 5, hybrid: bool = False) -> dict:
     if not EVAL_PATH.exists():
         raise FileNotFoundError(f"Missing eval set: {EVAL_PATH}")
 
@@ -41,6 +41,7 @@ def evaluate(top_k: int = 5) -> dict:
             "hits": 0,
             "total": len(questions),
             "chunk_count": 0,
+            "mode": "hybrid" if hybrid else "dense",
             "error": "Vector store is empty. Run scripts/build_index.py first.",
             "results": [],
         }
@@ -53,7 +54,7 @@ def evaluate(top_k: int = 5) -> dict:
         page_min = int(item.get("expected_page_min", 1))
         page_max = int(item.get("expected_page_max", 9999))
 
-        retrieved = retrieve(question, top_k=top_k)
+        retrieved = retrieve(question, top_k=top_k, hybrid=hybrid)
         matched = False
         matched_pages: list[int] = []
         for row in retrieved:
@@ -84,16 +85,24 @@ def evaluate(top_k: int = 5) -> dict:
         "total": len(questions),
         "chunk_count": chunk_count,
         "top_k": top_k,
+        "mode": "hybrid" if hybrid else "dense",
         "results": results,
     }
 
 
 def main() -> int:
+    import argparse
+    parser = argparse.ArgumentParser(description="Evaluate retrieval hit rate.")
+    parser.add_argument("--hybrid", action="store_true", help="Enable hybrid BM25 + dense search")
+    parser.add_argument("--top-k", type=int, default=5, help="Number of chunks to retrieve")
+    args = parser.parse_args()
+
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    report = evaluate()
+    report = evaluate(top_k=args.top_k, hybrid=args.hybrid)
     REPORT_PATH.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
-    print(f"Retrieval evaluation — {report['hits']}/{report['total']} hits")
+    mode_str = "Hybrid (BM25 + Dense)" if args.hybrid else "Dense Vector"
+    print(f"Retrieval evaluation ({mode_str}) — {report['hits']}/{report['total']} hits")
     print(f"Hit rate: {report['hit_rate'] * 100:.1f}%")
     print(f"Chunk count: {report['chunk_count']}")
     print(f"Report: {REPORT_PATH}")
@@ -109,3 +118,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+

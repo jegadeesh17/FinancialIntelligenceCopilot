@@ -21,7 +21,7 @@ class TestEvalRetrieval:
 
         monkeypatch.setattr("scripts.eval_retrieval.get_collection_count", lambda: 10)
 
-        def fake_retrieve(question, top_k=5):  # noqa: ARG001
+        def fake_retrieve(question, top_k=5, **kwargs):  # noqa: ARG001
             if "KYC" in question or "kyc" in question.lower() or "capital" in question.lower():
                 return [
                     RetrievalResult(

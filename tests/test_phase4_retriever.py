@@ -124,6 +124,21 @@ class TestRetriever:
         )
         assert results == []
 
+    def test_retrieve_hybrid_returns_ranked_results(self, sample_chunks, chroma_dir, settings):
+        from src.retriever import retrieve_hybrid
+        from src.vectorstore import get_chroma_client, upsert_chunks
+
+        client = get_chroma_client(persist_dir=chroma_dir, settings=settings)
+        upsert_chunks(sample_chunks, client=client, settings=settings)
+        results = retrieve_hybrid(
+            "disclosure obligations SEBI LODR",
+            top_k=2,
+            settings=settings,
+            persist_dir=chroma_dir,
+        )
+        assert len(results) > 0
+        assert results[0].source
+
 
 @pytest.mark.integration
 class TestRetrieverIntegration:

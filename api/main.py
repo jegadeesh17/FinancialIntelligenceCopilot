@@ -26,6 +26,7 @@ _request_buckets: dict[str, deque[float]] = defaultdict(deque)
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
+    hybrid: bool = Field(default=False, description="Enable hybrid BM25 + dense search")
 
 
 class CitationOut(BaseModel):
@@ -84,7 +85,7 @@ def ask(req: AskRequest, request: Request, x_api_key: str | None = Header(defaul
     if not question:
         raise HTTPException(status_code=422, detail="Question must not be empty.")
 
-    contexts = retrieve(question)
+    contexts = retrieve(question, hybrid=req.hybrid)
     response = generate_answer(question, contexts)
     low_confidence = is_low_confidence(contexts)
     best_score = get_best_score(contexts)

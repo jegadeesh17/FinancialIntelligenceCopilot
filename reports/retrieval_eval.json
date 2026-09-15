@@ -1,9 +1,10 @@
 {
-  "hit_rate": 0.9,
-  "hits": 9,
+  "hit_rate": 0.7,
+  "hits": 7,
   "total": 10,
-  "chunk_count": 3459,
+  "chunk_count": 12075,
   "top_k": 5,
+  "mode": "dense",
   "results": [
     {
       "id": "kyc-001",
@@ -43,14 +44,14 @@
       "expected_doc": "HDFC_Bank_Annual_Report",
       "hit": true,
       "top_sources": [
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf"
+        "tcs_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf"
       ],
       "top_pages": [
+        3,
         480,
-        520,
-        340
+        520
       ]
     },
     {
@@ -59,9 +60,9 @@
       "expected_doc": "HDFC_Bank_Annual_Report",
       "hit": true,
       "top_sources": [
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf"
+        "hdfc_bank_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf"
       ],
       "top_pages": [
         399,
@@ -75,9 +76,9 @@
       "expected_doc": "HDFC_Bank_Annual_Report",
       "hit": true,
       "top_sources": [
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf"
+        "hdfc_bank_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf"
       ],
       "top_pages": [
         16,
@@ -92,12 +93,12 @@
       "hit": true,
       "top_sources": [
         "sebi_circular_disclosure.pdf",
-        "sebi_lodr_governance.pdf",
+        "sebi_lodr_ncd_operational_circular.pdf",
         "sebi_circular_disclosure.pdf"
       ],
       "top_pages": [
         1,
-        1,
+        53,
         1
       ]
     },
@@ -109,28 +110,28 @@
       "top_sources": [
         "sebi_circular_disclosure.pdf",
         "sebi_circular_disclosure.pdf",
-        "sebi_lodr_governance.pdf"
+        "Tata Consumer Products Ltd IAR 2025-2026.pdf"
       ],
       "top_pages": [
         3,
         1,
-        1
+        101
       ]
     },
     {
       "id": "aml-001",
       "question": "What are AML and CFT requirements mentioned in RBI master directions?",
       "expected_doc": "rbi_master_direction_aml",
-      "hit": true,
+      "hit": false,
       "top_sources": [
-        "rbi_master_direction_aml.pdf",
-        "rbi_master_direction_aml.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf"
+        "hdfc_bank_annual_report.pdf",
+        "hdfc_bank_annual_report.pdf",
+        "rbi_master_direction_kyc.pdf"
       ],
       "top_pages": [
-        3,
-        1,
-        429
+        429,
+        236,
+        62
       ]
     },
     {
@@ -141,7 +142,7 @@
       "top_sources": [
         "rbi_master_direction_kyc.pdf",
         "rbi_master_direction_kyc.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf"
+        "hdfc_bank_annual_report.pdf"
       ],
       "top_pages": [
         23,
@@ -153,16 +154,16 @@
       "id": "lodr-001",
       "question": "What corporate governance disclosures are required under SEBI listing obligations?",
       "expected_doc": "sebi_lodr_governance",
-      "hit": true,
+      "hit": false,
       "top_sources": [
-        "sebi_lodr_governance.pdf",
-        "sebi_circular_disclosure.pdf",
-        "HDFC_Bank_Annual_Report_2024_25-310202.pdf"
+        "Tata Consumer Products Ltd IAR 2025-2026.pdf",
+        "tcs_annual_report.pdf",
+        "Tata Consumer Products Ltd IAR 2025-2026.pdf"
       ],
       "top_pages": [
-        1,
-        1,
-        248
+        101,
+        93,
+        172
       ]
     }
   ]
