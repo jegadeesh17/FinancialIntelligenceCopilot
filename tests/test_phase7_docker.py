@@ -27,8 +27,8 @@ class TestDockerArtifacts:
 
     def test_dockerfile_contains_streamlit_command(self):
         dockerfile = (PROJECT_ROOT / "Dockerfile").read_text(encoding="utf-8")
-        assert "streamlit" in dockerfile and "app/app.py" in dockerfile
-        assert "EXPOSE 8501" in dockerfile
+        assert "uvicorn" in dockerfile and "api.main:app" in dockerfile
+        assert "EXPOSE 8080" in dockerfile
 
     def test_compose_maps_port_and_mounts_data(self):
         compose = (PROJECT_ROOT / "docker-compose.yml").read_text(encoding="utf-8")

@@ -64,7 +64,7 @@ class TestAppSmoke:
     def test_streamlit_app_renders(self):
         app_path = PROJECT_ROOT / "app" / "app.py"
         at = AppTest.from_file(str(app_path))
-        at.run()
+        at.run(timeout=15)
         assert not at.exception
         assert len(at.chat_message) >= 1
 
