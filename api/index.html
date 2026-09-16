@@ -5,199 +5,248 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Financial Intelligence Copilot - Citation-grounded enterprise RAG over BFSI regulatory circulars and annual reports.">
     <title>Financial Intelligence Copilot</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%2310b981%27%2F%3E%3Cpath%20d%3D%27M8%2022L14%2014L18%2018L24%2010%27%20stroke%3D%27%23ffffff%27%20stroke-width%3D%272.5%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="color-scheme" content="light">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230B1220%27%2F%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%2712.5%27%20stroke%3D%27%23C9A24B%27%20stroke-width%3D%271.2%27%2F%3E%3Cpath%20d%3D%27M10%2016.5L14%2020.5L22%2011.5%27%20stroke%3D%27%23C9A24B%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E">
+    <meta name="theme-color" content="#F6F3EA">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
-            --glass-bg: rgba(30, 41, 59, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --field-bg: rgba(15, 23, 42, 0.6);
-            --primary: #10b981;
-            --primary-hover: #059669;
-            --accent: #3b82f6;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --bg: #f6f3ea;
+            --panel: #fffdf7;
+            --line: rgba(150, 113, 45, 0.25);
+            --line-soft: rgba(22, 32, 47, 0.09);
+            --field-bg: #f8f6ef;
+            --track: #dad4c2;
+            --gold: #9c6f28;
+            --gold-hover: #7e5920;
+            --ink-on-gold: #15202f;
+            --text-1: #16202f;
+            --text-2: #55617a;
+            --text-3: #7a8296;
+            --amber: #a15b16;
+            --danger: #9c3f2c;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-1);
             min-height: 100vh;
-            padding: 2rem 1.25rem 3rem;
+            padding: 2.75rem 1.25rem 4rem;
             background-image:
-                radial-gradient(circle at 15% 40%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 85% 60%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+                radial-gradient(circle at 1px 1px, rgba(22, 32, 47, 0.05) 1px, transparent 0),
+                radial-gradient(ellipse at 50% -10%, rgba(156, 111, 40, 0.08) 0%, transparent 55%);
+            background-size: 26px 26px, 100% 100%;
             background-attachment: fixed;
         }
-        .container { width: 100%; max-width: 900px; margin: 0 auto; }
-        .app-header {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;
-        }
-        .brand { display: flex; align-items: baseline; gap: .6rem; }
-        .brand h1 { font-size: 1.5rem; font-weight: 600; letter-spacing: -.01em; }
-        .brand span { font-size: .82rem; color: var(--text-dim); font-weight: 400; }
-        .header-actions { display: flex; align-items: center; gap: .75rem; }
-        .status {
-            display: inline-flex; align-items: center; gap: .5rem;
-            padding: .4rem .8rem; border-radius: 999px;
-            background: rgba(15, 23, 42, .6); border: 1px solid var(--glass-border);
-            font-size: .78rem; color: var(--text-muted);
-        }
-        .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); flex: none; }
-        .dot.online { background: var(--primary); box-shadow: 0 0 8px rgba(16,185,129,.7); }
-        .dot.offline { background: var(--danger); }
-        .doc-link {
-            font-size: .82rem; color: var(--text-muted); text-decoration: none;
-            padding: .4rem .75rem; border-radius: 8px; border: 1px solid var(--glass-border);
-            transition: all .2s;
-        }
-        .doc-link:hover { color: #fff; background: rgba(255,255,255,.05); border-color: var(--primary); }
+        .container { width: 100%; max-width: 840px; margin: 0 auto; }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border); border-radius: 20px;
-            padding: 1.75rem; box-shadow: 0 8px 32px rgba(0,0,0,.3);
+        /* Masthead */
+        .masthead {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 1.75rem;
+        }
+        .brand { display: flex; align-items: center; gap: .85rem; }
+        .seal { flex: none; }
+        .brand h1 {
+            font-family: 'Source Serif 4', serif; font-weight: 600;
+            font-size: 1.7rem; letter-spacing: -0.01em; color: var(--text-1);
+            line-height: 1.15;
+        }
+        .brand p {
+            font-size: .88rem; color: var(--text-2); margin-top: .3rem; max-width: 34ch;
+        }
+        .header-actions { display: flex; align-items: center; gap: .7rem; padding-top: .2rem; }
+        .status {
+            display: inline-flex; align-items: center; gap: .55rem;
+            padding: .4rem .8rem; border-radius: 999px;
+            background: var(--panel); border: 1px solid var(--line-soft);
+            font-size: .78rem; color: var(--text-2);
+        }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-3); flex: none; }
+        .dot.online { background: var(--gold); }
+        .dot.offline { background: var(--danger); }
+        .dot.pending { background: var(--amber); animation: pulseDot 1.7s ease-in-out infinite; }
+        @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+        .doc-link {
+            font-size: .78rem; color: var(--text-2); text-decoration: none;
+            padding: .4rem .75rem; border-radius: 999px; border: 1px solid var(--line-soft);
+            transition: color .15s, border-color .15s;
+        }
+        .doc-link:hover { color: var(--text-1); border-color: var(--line); }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line-soft);
+            border-radius: 14px;
+            box-shadow: 0 1px 2px rgba(22, 32, 47, 0.04), 0 10px 26px -18px rgba(22, 32, 47, 0.16);
+            padding: 1.75rem;
             margin-bottom: 1.5rem;
         }
-        .model-strip {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: .75rem; flex-wrap: wrap;
-            padding: .6rem .85rem; margin-bottom: 1.25rem;
-            background: rgba(15,23,42,.45); border: 1px solid var(--glass-border);
-            border-radius: 10px; font-size: .78rem; color: var(--text-muted);
-        }
-        .model-strip strong { color: var(--text-main); font-weight: 500; }
 
-        .sample-queries { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.25rem; }
-        .sample-pill {
-            font-size: .75rem; background: rgba(15,23,42,.6); border: 1px solid var(--glass-border);
-            color: var(--text-muted); padding: .35rem .7rem; border-radius: 999px; cursor: pointer;
-            transition: all .2s;
+        .spec-row {
+            display: flex; flex-wrap: wrap; gap: .5rem 1.5rem;
+            padding: 0 0 1.1rem; margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--line-soft);
+            font-size: .8rem; color: var(--text-3);
         }
-        .sample-pill:hover { color: #fff; border-color: var(--primary); background: rgba(16,185,129,.1); }
+        .spec-row strong { color: var(--text-2); font-weight: 500; }
+
+        .field-label {
+            font-size: .8rem; color: var(--text-2); margin-bottom: .7rem;
+        }
+        .sample-queries { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.4rem; }
+        .sample-pill {
+            font-size: .78rem; background: transparent; border: 1px solid var(--line-soft);
+            color: var(--text-2); padding: .4rem .75rem; border-radius: 999px; cursor: pointer;
+            transition: color .15s, border-color .15s;
+        }
+        .sample-pill:hover { color: var(--text-1); border-color: var(--gold); }
 
         .form-group { margin-bottom: 1rem; }
         textarea {
-            width: 100%; padding: .8rem .9rem; border-radius: 12px;
-            background: var(--field-bg); border: 1px solid var(--glass-border);
-            color: var(--text-main); font-size: .95rem; resize: vertical; min-height: 90px;
-            transition: border-color .2s, box-shadow .2s;
+            width: 100%; padding: .85rem .95rem; border-radius: 10px;
+            background: var(--field-bg); border: 1px solid var(--line-soft);
+            color: var(--text-1); font-size: .95rem; font-family: inherit;
+            resize: vertical; min-height: 90px;
+            transition: border-color .15s, box-shadow .15s;
         }
-        textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16,185,129,.18); }
+        textarea::placeholder { color: var(--text-3); }
+        textarea:focus-visible { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(156, 111, 40, 0.18); }
 
         .toggle-row {
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(15,23,42,.4); padding: .75rem 1rem; border-radius: 12px;
-            border: 1px solid var(--glass-border); margin-bottom: 1.25rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            padding: .85rem 0; border-top: 1px solid var(--line-soft);
+            margin-bottom: 1.4rem;
         }
-        .toggle-label { font-size: .85rem; color: var(--text-main); }
-        .toggle-sub { font-size: .72rem; color: var(--text-dim); display: block; }
+        .toggle-label { font-size: .85rem; color: var(--text-1); }
+        .toggle-sub { font-size: .76rem; color: var(--text-3); display: block; margin-top: .15rem; }
 
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex: none; }
+        .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
         .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #334155; transition: .3s; border-radius: 24px;
+            position: absolute; cursor: pointer; inset: 0;
+            background-color: var(--track); transition: .2s; border-radius: 24px;
         }
         .slider:before {
             position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
-            background-color: white; transition: .3s; border-radius: 50%;
+            background-color: #ffffff; transition: .2s; border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(22, 32, 47, 0.25);
         }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(20px); }
+        input:checked + .slider { background-color: var(--gold); }
+        input:checked + .slider:before { transform: translateX(18px); background-color: var(--ink-on-gold); }
+        input:focus-visible + .slider { outline: 2px solid var(--gold); outline-offset: 2px; }
 
         .submit-btn {
-            width: 100%; padding: .85rem; border: none; border-radius: 11px;
-            background: var(--primary); color: #fff; font-size: .95rem; font-weight: 600;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .6rem;
-            transition: background .2s;
+            width: 100%; padding: .85rem; border: none; border-radius: 10px;
+            background: var(--gold); color: var(--ink-on-gold); font-size: .95rem; font-weight: 600;
+            font-family: inherit; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: .6rem;
+            transition: background .15s;
         }
-        .submit-btn:hover:not(:disabled) { background: var(--primary-hover); }
-        .submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+        .submit-btn:hover:not(:disabled) { background: var(--gold-hover); }
+        .submit-btn:disabled { opacity: .55; cursor: not-allowed; }
+        .submit-btn:focus-visible { outline: 2px solid var(--text-1); outline-offset: 2px; }
 
-        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; display: none; }
+        .spinner {
+            width: 15px; height: 15px; border: 2px solid rgba(22, 32, 47, .35);
+            border-top-color: var(--ink-on-gold); border-radius: 50%;
+            animation: spin .7s linear infinite; display: none;
+        }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Results Card */
-        .result-panel { display: none; animation: fadeIn .35s ease; }
-        @keyframes fadeIn { from {opacity:0; transform:translateY(8px)} to {opacity:1; transform:none} }
+        /* Result panel */
+        .result-panel { display: none; animation: reveal .3s ease; }
+        @keyframes reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        .meta-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .meta-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
         .badge {
-            font-size: .75rem; padding: .25rem .65rem; border-radius: 6px; font-weight: 500;
-            border: 1px solid var(--glass-border);
+            font-size: .76rem; padding: .3rem .65rem; border-radius: 6px; font-weight: 500;
+            border: 1px solid var(--line-soft); color: var(--text-2);
         }
-        .badge.score { background: rgba(59,130,246,.15); color: #60a5fa; }
-        .badge.model { background: rgba(16,185,129,.15); color: #34d399; }
-        .badge.conf-ok { background: rgba(16,185,129,.15); color: #34d399; }
-        .badge.conf-low { background: rgba(245,158,11,.15); color: #fbbf24; }
+        .badge.conf-ok { color: var(--gold); border-color: rgba(156, 111, 40, 0.35); }
+        .badge.conf-low { color: var(--amber); border-color: rgba(161, 91, 22, 0.35); }
 
         .answer-box {
-            background: rgba(15,23,42,.5); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 1.25rem; font-size: .95rem; line-height: 1.6;
-            margin-bottom: 1.25rem; color: #f1f5f9; white-space: pre-wrap;
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.08rem; line-height: 1.7; color: var(--text-1);
+            white-space: pre-wrap;
+            padding-bottom: 1.5rem; margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--line-soft);
         }
 
-        .citations-header { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); margin-bottom: .75rem; }
+        .citations-header { font-size: .82rem; color: var(--text-2); margin-bottom: .8rem; }
         .citation-card {
-            background: rgba(15,23,42,.4); border: 1px solid var(--glass-border);
-            border-radius: 10px; padding: .85rem; margin-bottom: .6rem;
-            transition: border-color .2s;
+            border: 1px solid var(--line-soft);
+            border-radius: 10px; padding: .85rem .95rem; margin-bottom: .6rem;
+            transition: border-color .15s;
         }
-        .citation-card:hover { border-color: rgba(16,185,129,.4); }
-        .citation-top { display: flex; justify-content: space-between; font-size: .78rem; color: var(--text-muted); margin-bottom: .4rem; }
-        .citation-source { color: #38bdf8; font-weight: 500; }
-        .citation-snippet { font-size: .82rem; color: var(--text-dim); line-height: 1.45; }
+        .citation-card:hover { border-color: var(--line); }
+        .citation-top { display: flex; justify-content: space-between; gap: 1rem; font-size: .78rem; color: var(--text-2); margin-bottom: .4rem; }
+        .citation-source { color: var(--gold); font-weight: 500; }
+        .citation-snippet { font-size: .82rem; color: var(--text-3); line-height: 1.5; }
+
+        @media (max-width: 560px) {
+            .brand h1 { font-size: 1.4rem; }
+            .masthead { flex-direction: column; }
+            .header-actions { padding-top: 0; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .spinner, .dot.pending, .result-panel { animation: none !important; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <header class="app-header">
+    <header class="masthead">
         <div class="brand">
-            <h1>Financial Intelligence Copilot</h1>
-            <span>BFSI RAG · BM25 + Dense</span>
+            <svg class="seal" width="36" height="36" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                <circle cx="17" cy="17" r="15" stroke="#9C6F28" stroke-width="1.2"/>
+                <circle cx="17" cy="17" r="11" stroke="#9C6F28" stroke-width="0.6" opacity="0.45"/>
+                <path d="M10.5 17.5L14.5 21.5L23.5 11.5" stroke="#9C6F28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div>
+                <h1>Financial Intelligence Copilot</h1>
+                <p>Regulatory research across RBI, SEBI, and insurance circulars — every answer cites its page.</p>
+            </div>
         </div>
         <div class="header-actions">
-            <div class="status">
+            <div class="status" role="status" aria-live="polite">
                 <span class="dot pending" id="statusDot"></span>
-                <span id="statusText">Checking Index...</span>
+                <span id="statusText">Checking index…</span>
             </div>
-            <a href="/docs" target="_blank" class="doc-link">Swagger Docs</a>
+            <a href="/docs" target="_blank" class="doc-link">API docs</a>
         </div>
     </header>
 
-    <main class="glass-panel">
-        <div class="model-strip">
-            <div>Vector Store: <strong>ChromaDB + all-MiniLM-L6-v2</strong></div>
-            <div>Retrieval: <strong>Reciprocal Rank Fusion (RRF)</strong></div>
-            <div>Corpus: <strong id="corpusStats">BFSI Regulatory PDFs</strong></div>
+    <main class="panel">
+        <div class="spec-row">
+            <span>Vector store: <strong>ChromaDB + all-MiniLM-L6-v2</strong></span>
+            <span>Retrieval: <strong>Reciprocal rank fusion (RRF)</strong></span>
+            <span>Corpus: <strong id="corpusStats">Connecting to your library…</strong></span>
         </div>
 
+        <p class="field-label">Suggested questions</p>
         <div class="sample-queries">
-            <span class="sample-pill" onclick="setQuery('What are the key RBI guidelines on digital lending and collection agents?')">RBI Digital Lending</span>
-            <span class="sample-pill" onclick="setQuery('What are SEBI disclosure requirements for draft red herring prospectus (DRHP)?')">SEBI DRHP Disclosures</span>
-            <span class="sample-pill" onclick="setQuery('Summarize HDFC Bank quarterly NPA provisioning guidelines and ratios.')">HDFC Provisioning</span>
-            <span class="sample-pill" onclick="setQuery('What is the KYC requirement for non-face-to-face customer onboarding?')">RBI Video KYC</span>
+            <span class="sample-pill" onclick="setQuery('What are the key RBI guidelines on digital lending and collection agents?')">RBI digital lending</span>
+            <span class="sample-pill" onclick="setQuery('What are SEBI disclosure requirements for draft red herring prospectus (DRHP)?')">SEBI DRHP disclosures</span>
+            <span class="sample-pill" onclick="setQuery('Summarize HDFC Bank quarterly NPA provisioning guidelines and ratios.')">HDFC provisioning</span>
+            <span class="sample-pill" onclick="setQuery('What is the KYC requirement for non-face-to-face customer onboarding?')">RBI video KYC</span>
         </div>
 
         <form id="ragForm">
             <div class="form-group">
-                <textarea id="questionInput" placeholder="Ask a financial regulatory question or search circulars..." required></textarea>
+                <textarea id="questionInput" placeholder="Ask about a circular, disclosure rule, or provisioning requirement..." required></textarea>
             </div>
 
             <div class="toggle-row">
                 <div>
-                    <span class="toggle-label">Hybrid BM25 + Dense Search</span>
-                    <span class="toggle-sub">Combines sparse keyword matching with semantic vector embeddings via RRF</span>
+                    <span class="toggle-label">Hybrid BM25 + dense search</span>
+                    <span class="toggle-sub">Combines keyword matching with semantic search to widen recall.</span>
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="hybridToggle" checked>
@@ -207,21 +256,21 @@
 
             <button type="submit" class="submit-btn" id="submitBtn">
                 <span class="spinner" id="btnSpinner"></span>
-                <span id="btnText">Query Copilot</span>
+                <span id="btnText">Ask the copilot</span>
             </button>
         </form>
     </main>
 
-    <section class="glass-panel result-panel" id="resultPanel">
+    <section class="panel result-panel" id="resultPanel">
         <div class="meta-badges">
             <span class="badge score" id="scoreBadge">Score: --</span>
             <span class="badge model" id="modelBadge">Model: --</span>
-            <span class="badge conf-ok" id="confBadge">High Confidence</span>
+            <span class="badge conf-ok" id="confBadge">Grounded answer</span>
         </div>
 
         <div class="answer-box" id="answerBox">Generating answer...</div>
 
-        <div class="citations-header">Retrieved Citations & Source Chunks</div>
+        <div class="citations-header">Sources</div>
         <div id="citationsContainer"></div>
     </section>
 </div>
@@ -248,24 +297,25 @@
         questionInput.focus();
     }
 
-    // Health check on boot
+    // Health check on boot. Cloud Run scales to zero, so a slow first
+    // response usually means a cold start rather than an outage.
     async function checkHealth() {
         try {
             const res = await fetch('/health');
             if (res.ok) {
                 const data = await res.json();
                 statusDot.className = 'dot online';
-                statusText.textContent = `${data.chunk_count || 'Ready'} Chunks Online`;
+                statusText.textContent = data.chunk_count ? `${data.chunk_count} chunks ready` : 'Ready';
                 if (data.index_metadata && data.index_metadata.chunk_count) {
-                    corpusStats.textContent = `${data.index_metadata.chunk_count} Semantic Chunks`;
+                    corpusStats.textContent = `${data.index_metadata.chunk_count} indexed chunks`;
                 }
             } else {
                 statusDot.className = 'dot offline';
-                statusText.textContent = 'API Offline';
+                statusText.textContent = 'Index unavailable';
             }
         } catch {
-            statusDot.className = 'dot offline';
-            statusText.textContent = 'Service Standby';
+            statusDot.className = 'dot pending';
+            statusText.textContent = 'Waking the service — this can take a few seconds';
         }
     }
     checkHealth();
@@ -277,7 +327,7 @@
 
         submitBtn.disabled = true;
         btnSpinner.style.display = 'inline-block';
-        btnText.textContent = 'Retrieving & Generating...';
+        btnText.textContent = 'Searching your documents...';
         resultPanel.style.display = 'none';
 
         try {
@@ -291,22 +341,22 @@
             });
 
             if (!res.ok) {
-                const err = await res.json().catch(() => ({ detail: 'Service error' }));
-                throw new Error(err.detail || 'Inference failed');
+                const err = await res.json().catch(() => ({ detail: 'The copilot could not process that question.' }));
+                throw new Error(err.detail || 'The copilot could not process that question.');
             }
 
             const data = await res.json();
 
             answerBox.textContent = data.answer;
-            scoreBadge.textContent = data.best_score ? `Top Score: ${data.best_score.toFixed(3)}` : 'Dense Match';
+            scoreBadge.textContent = data.best_score ? `Score: ${data.best_score.toFixed(3)}` : 'Dense match';
             modelBadge.textContent = data.model || 'Portkey / MiniLM';
 
             if (data.low_confidence) {
                 confBadge.className = 'badge conf-low';
-                confBadge.textContent = 'Low Retrieval Confidence';
+                confBadge.textContent = 'Low confidence — verify sources';
             } else {
                 confBadge.className = 'badge conf-ok';
-                confBadge.textContent = 'High Confidence';
+                confBadge.textContent = 'Grounded answer';
             }
 
             citationsContainer.innerHTML = '';
@@ -335,16 +385,22 @@
                     citationsContainer.appendChild(card);
                 });
             } else {
-                citationsContainer.innerHTML = '<div style="color: var(--text-dim); font-size: .85rem;">No citations returned for this query.</div>';
+                citationsContainer.innerHTML = '<div style="color: var(--text-3); font-size: .85rem;">No supporting sources were found for this answer.</div>';
             }
 
             resultPanel.style.display = 'block';
         } catch (err) {
-            alert('Query Error: ' + err.message);
+            scoreBadge.textContent = 'Score: —';
+            modelBadge.textContent = 'Model: —';
+            confBadge.className = 'badge conf-low';
+            confBadge.textContent = 'Request failed';
+            answerBox.textContent = err.message || 'The copilot could not reach the document index. Try again in a moment.';
+            citationsContainer.innerHTML = '';
+            resultPanel.style.display = 'block';
         } finally {
             submitBtn.disabled = false;
             btnSpinner.style.display = 'none';
-            btnText.textContent = 'Query Copilot';
+            btnText.textContent = 'Ask the copilot';
         }
     });
 </script>
