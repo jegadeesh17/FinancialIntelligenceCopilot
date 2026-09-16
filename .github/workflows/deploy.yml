@@ -19,9 +19,9 @@ jobs:
 
       - name: Download ChromaDB Vector Index from Release
         run: |
-          gh release download v0.1.0-data -p "chroma_db.zip" -D data/
-          unzip -q data/chroma_db.zip -d data/
-          rm data/chroma_db.zip
+          gh release download v0.1.0-data -p "chroma_db_linux.zip" -D data/
+          unzip -q data/chroma_db_linux.zip -d data/
+          rm data/chroma_db_linux.zip
           echo "--- Verifying index ---"
           ls -la data/chroma_db/
         env:
