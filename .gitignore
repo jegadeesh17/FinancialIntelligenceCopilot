@@ -22,3 +22,13 @@ models/*
 .chroma/
 logs/*
 !logs/.keep
+
+# Tool caches
+.mypy_cache/
+.ruff_cache/
+
+# Archive files (should never be committed — too large)
+*.zip
+*.7z
+*.tar.gz
+*.gz
