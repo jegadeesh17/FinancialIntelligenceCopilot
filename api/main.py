@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
+import logging
 import os
 import sys
 from time import time
@@ -12,6 +13,7 @@ if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
 from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from src.config import get_settings
@@ -20,6 +22,8 @@ from src.generator import generate_answer
 from src.indexing import read_index_metadata
 from src.retriever import get_best_score, is_low_confidence, retrieve
 from src.vectorstore import get_collection_count
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Financial Intelligence Copilot API",
@@ -30,9 +34,31 @@ _REQUEST_WINDOW_SECONDS = 60
 _request_buckets: dict[str, deque[float]] = defaultdict(deque)
 
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Catch-all for unhandled exceptions.
+
+    Logs the full traceback server-side and returns a clean, structured error
+    body without leaking internals to the client. FastAPI/Starlette resolve
+    HTTPException (and RequestValidationError) via their own exact-type
+    handlers first, so existing 401/404/422/429 responses are unaffected.
+    """
+    logger.exception("Unhandled exception while processing %s %s", request.method, request.url.path, exc_info=exc)
+    return JSONResponse(
+        status_code=500,
+        content={"error": "internal_error", "detail": "An unexpected error occurred."},
+    )
+
+
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
-    hybrid: bool = Field(default=False, description="Enable hybrid BM25 + dense search")
+    hybrid: bool = Field(
+        default_factory=lambda: get_settings().enable_hybrid_search,
+        description=(
+            "Enable hybrid BM25 + dense search. Defaults to the server's "
+            "ENABLE_HYBRID_SEARCH setting; pass true/false explicitly to override."
+        ),
+    )
 
 
 class CitationOut(BaseModel):

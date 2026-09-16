@@ -47,13 +47,13 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | 8 | Per-phase pytest checkpoint tests |
 | 9 | Corpus ratio health checks for compliance vs earnings mix |
 | 10 | Corpus telemetry and confidence-oriented UX signals |
+| 11 | Hybrid BM25 + vector search via Reciprocal Rank Fusion (enabled by default) |
 
 ### 2.2 Out of Scope
 
 - Multi-user authentication / RBAC
 - Local LLM inference (OpenRouter is the locked provider)
 - OCR for scanned PDFs (text-based PDFs only)
-- Hybrid BM25 + vector search (future improvement)
 - Automated RAGAS / faithfulness evaluation suite (future improvement)
 
 ---
@@ -78,6 +78,7 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | FR-12 | Return confidence fields in `/ask` and UI | `api/main.py`, `app/app.py` | ✅ |
 | FR-13 | Attach metadata to chunks (`retrieved_at`, `regulator`, `document_category`) | `src/ingest_docs.py`, `src/vectorstore.py` | ✅ |
 | FR-14 | Expose corpus mix summary in API health + UI sidebar | `src/corpus_stats.py`, `api/main.py`, `app/app.py` | ✅ |
+| FR-15 | Hybrid BM25 + dense retrieval via Reciprocal Rank Fusion, enabled by default (`ENABLE_HYBRID_SEARCH`) | `src/retriever.py`, `configs/settings.py`, `api/main.py` | ✅ |
 
 ### 3.2 Non-Functional Requirements
 

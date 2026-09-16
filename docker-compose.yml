@@ -1,7 +1,33 @@
 services:
-  app:
+  # FastAPI backend — matches the Dockerfile's CMD (uvicorn api.main:app) and
+  # the container actually deployed to Cloud Run. This is what `docker compose up`
+  # brings up by default.
+  api:
     build: .
-    container_name: financial-compliance-rag
+    container_name: financial-compliance-api
+    ports:
+      - "${PORT:-8080}:${PORT:-8080}"
+    environment:
+      - PORT=${PORT:-8080}
+    env_file:
+      - .env
+    volumes:
+      - ./data/raw_pdfs:/app/data/raw_pdfs
+      - ./data/chroma_db:/app/data/chroma_db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${PORT:-8080}/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  # Optional local-dev Streamlit UI (app/app.py). Not part of the production
+  # image's own entrypoint — started explicitly via `docker compose --profile ui up`.
+  streamlit:
+    build: .
+    container_name: financial-compliance-ui
+    command: ["streamlit", "run", "app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
     ports:
       - "8501:8501"
     env_file:
@@ -10,3 +36,5 @@ services:
       - ./data/raw_pdfs:/app/data/raw_pdfs
       - ./data/chroma_db:/app/data/chroma_db
     restart: unless-stopped
+    profiles:
+      - ui
