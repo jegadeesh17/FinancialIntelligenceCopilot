@@ -109,3 +109,24 @@ def ask(req: AskRequest, request: Request, x_api_key: str | None = Header(defaul
             for item in contexts[:5]
         ],
     )
+
+
+# ---------------------------------------------------------------------------
+# Embedded Frontend UI (/app) & Root Redirect
+# ---------------------------------------------------------------------------
+from fastapi.responses import FileResponse, RedirectResponse
+import os
+
+@app.get("/app", response_class=FileResponse, include_in_schema=False)
+@app.get("/app/", response_class=FileResponse, include_in_schema=False)
+def serve_app_ui():
+    html_path = os.path.join(os.path.dirname(__file__), "index.html")
+    if not os.path.exists(html_path):
+        raise HTTPException(status_code=404, detail="UI file not found")
+    return FileResponse(html_path)
+
+
+@app.get("/", include_in_schema=False)
+def root_redirect():
+    return RedirectResponse(url="/app")
+
