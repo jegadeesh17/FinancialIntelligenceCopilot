@@ -37,6 +37,9 @@ RUN groupadd -g 10001 appgroup && \
 COPY --from=builder /opt/venv /opt/venv
 COPY --chown=appuser:appgroup . .
 
+# Create HF cache directory writable by appuser
+RUN mkdir -p /app/.cache/huggingface && chown -R appuser:appgroup /app/.cache
+
 USER appuser
 
 # Pre-download embedding model so containers start without network fetches
