@@ -8,3 +8,5 @@ venv
 notebooks
 tests
 models
+*.zip
+data/*.zip

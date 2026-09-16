@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
+import os
+import sys
 from time import time
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from pydantic import BaseModel, Field
