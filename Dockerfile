@@ -23,7 +23,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PATH="/opt/venv/bin:$PATH" \
     PYTHONPATH="/app" \
-    PORT=8080
+    PORT=8080 \
+    HF_HOME="/app/.cache/huggingface"
 
 WORKDIR /app
 
@@ -37,6 +38,9 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --chown=appuser:appgroup . .
 
 USER appuser
+
+# Pre-download embedding model so containers start without network fetches
+RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
 EXPOSE 8080
 

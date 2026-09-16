@@ -17,6 +17,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Download ChromaDB Vector Index from Release
+        run: |
+          gh release download v0.1.0-data -p "chroma_db.zip" -D data/
+          unzip -q data/chroma_db.zip -d data/
+          rm data/chroma_db.zip
+          echo "--- Verifying index ---"
+          ls -la data/chroma_db/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -42,8 +52,8 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --memory 1Gi \
+            --memory 2Gi \
             --cpu 1 \
             --min-instances 0 \
-            --max-instances 2
-
+            --max-instances 2 \
+            --set-env-vars "OPENROUTER_API_KEY=${{ secrets.OPENROUTER_API_KEY }}"
