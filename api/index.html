@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Financial Intelligence Copilot - Citation-grounded enterprise RAG over BFSI regulatory circulars and annual reports.">
+    <meta name="description" content="Financial Intelligence Copilot - ask questions about regulatory circulars, annual reports, insurance guidelines, and exam material, and get answers with exact page citations.">
     <title>Financial Intelligence Copilot</title>
     <meta name="color-scheme" content="light">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%230B1220%27%2F%3E%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%2712.5%27%20stroke%3D%27%23C9A24B%27%20stroke-width%3D%271.2%27%2F%3E%3Cpath%20d%3D%27M10%2016.5L14%2020.5L22%2011.5%27%20stroke%3D%27%23C9A24B%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%2F%3E%3C%2Fsvg%3E">
@@ -45,22 +45,25 @@
 
         /* Masthead */
         .masthead {
-            display: flex; align-items: flex-start; justify-content: space-between;
-            gap: 1.5rem; flex-wrap: wrap; padding-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--line);
             margin-bottom: 1.75rem;
         }
-        .brand { display: flex; align-items: center; gap: .85rem; }
+        .util-row {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: .7rem; flex-wrap: wrap; margin-bottom: 1.1rem;
+        }
+        .brand { display: flex; align-items: center; justify-content: center; gap: .65rem; }
         .seal { flex: none; }
         .brand h1 {
             font-family: 'Source Serif 4', serif; font-weight: 600;
-            font-size: 1.7rem; letter-spacing: -0.01em; color: var(--text-1);
-            line-height: 1.15;
+            font-size: 2rem; letter-spacing: -0.01em; color: var(--text-1);
+            line-height: 1.2;
         }
-        .brand p {
-            font-size: .88rem; color: var(--text-2); margin-top: .3rem; max-width: 34ch;
+        .tagline {
+            font-size: .95rem; line-height: 1.55; color: var(--text-2);
+            margin: .85rem auto 0; max-width: 52ch; text-align: center;
         }
-        .header-actions { display: flex; align-items: center; gap: .7rem; padding-top: .2rem; }
         .status {
             display: inline-flex; align-items: center; gap: .55rem;
             padding: .4rem .8rem; border-radius: 999px;
@@ -191,9 +194,8 @@
         .citation-snippet { font-size: .82rem; color: var(--text-3); line-height: 1.5; }
 
         @media (max-width: 560px) {
-            .brand h1 { font-size: 1.4rem; }
-            .masthead { flex-direction: column; }
-            .header-actions { padding-top: 0; }
+            .brand h1 { font-size: 1.5rem; }
+            .util-row { justify-content: space-between; }
         }
         @media (prefers-reduced-motion: reduce) {
             .spinner, .dot.pending, .result-panel { animation: none !important; }
@@ -203,24 +205,22 @@
 <body>
 <div class="container">
     <header class="masthead">
-        <div class="brand">
-            <svg class="seal" width="36" height="36" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-                <circle cx="17" cy="17" r="15" stroke="#9C6F28" stroke-width="1.2"/>
-                <circle cx="17" cy="17" r="11" stroke="#9C6F28" stroke-width="0.6" opacity="0.45"/>
-                <path d="M10.5 17.5L14.5 21.5L23.5 11.5" stroke="#9C6F28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <div>
-                <h1>Financial Intelligence Copilot</h1>
-                <p>Regulatory research across RBI, SEBI, and insurance circulars — every answer cites its page.</p>
-            </div>
-        </div>
-        <div class="header-actions">
+        <div class="util-row">
             <div class="status" role="status" aria-live="polite">
                 <span class="dot pending" id="statusDot"></span>
                 <span id="statusText">Checking index…</span>
             </div>
             <a href="/docs" target="_blank" class="doc-link">API docs</a>
         </div>
+        <div class="brand">
+            <svg class="seal" width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+                <circle cx="17" cy="17" r="15" stroke="#9C6F28" stroke-width="1.2"/>
+                <circle cx="17" cy="17" r="11" stroke="#9C6F28" stroke-width="0.6" opacity="0.45"/>
+                <path d="M10.5 17.5L14.5 21.5L23.5 11.5" stroke="#9C6F28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h1>Financial Intelligence Copilot</h1>
+        </div>
+        <p class="tagline">Ask about regulatory circulars, annual reports, insurance guidelines, and exam material in plain language. Every answer comes with the exact page it was drawn from, so you can verify it in seconds.</p>
     </header>
 
     <main class="panel">
