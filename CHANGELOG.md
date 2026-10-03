@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 - RAGAS answer-quality evaluation script and reports (`dad3a7f`).
 - `GET /eval` endpoint exposing the evaluation summary (`1da771f`).
 - "Eval metrics" popover and a one-screen hero layout in the web UI (`117bec1`).
+- MIT `LICENSE`, deployment and API docs (`204a6f3`), and evaluation methodology and decision records in `docs/EVALUATIONS.md` and `docs/DECISIONS.md` (`90b7652`).
 
 ### Changed
 
