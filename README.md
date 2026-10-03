@@ -3,12 +3,14 @@
 ### **Project Overview**
 **Financial Intelligence Copilot** is a Retrieval-Augmented Generation system for BFSI document intelligence. It ingests manually curated PDFs (regulatory circulars, annual reports, insurance guidelines, exam reference material), embeds them into ChromaDB, and answers questions via OpenRouter with **page-level citations** and retrieval confidence signals.
 
-**Interview pitch:** *"I built Financial Intelligence Copilot — a dual-vertical RAG system that answers compliance and earnings questions from RBI/SEBI circulars and quarterly-result PDFs, with ChromaDB retrieval, confidence gating, and auditable page-level citations."*
+**Interview pitch:** *"I built Financial Intelligence Copilot — a dual-vertical RAG system that answers compliance and earnings questions from RBI/SEBI circulars and annual-report PDFs, with ChromaDB retrieval, confidence gating, and auditable page-level citations."*
 
 **Live demo:** [https://financial-copilot-api-242711953247.asia-south1.run.app/app](https://financial-copilot-api-242711953247.asia-south1.run.app/app)  
 **Repository:** [github.com/jegadeesh17/FinancialIntelligenceCopilot](https://github.com/jegadeesh17/FinancialIntelligenceCopilot)  
 **Full specification:** [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)  
-**Learning log:** [docs/PHASE_LOG.md](docs/PHASE_LOG.md)
+**Learning log:** [docs/PHASE_LOG.md](docs/PHASE_LOG.md)  
+**API reference:** [docs/API.md](docs/API.md)  
+**Deployment guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 ---
 ### **Key Features**
@@ -37,6 +39,7 @@
 ### **Project Structure**
 ```text
 FinancialIntelligenceCopilot/
+├── .github/workflows/          # CI (tests) and Cloud Run deploy
 ├── api/                        # FastAPI service + web UI (index.html)
 ├── configs/                    # Pydantic settings
 ├── data/
@@ -45,6 +48,8 @@ FinancialIntelligenceCopilot/
 ├── docs/
 │   ├── PROJECT_SPEC.md         # Master technical specification
 │   ├── PHASE_LOG.md            # Per-phase learning notes
+│   ├── API.md                  # Endpoint reference
+│   ├── DEPLOYMENT.md           # Cloud Run pipeline, secrets, rollback
 │   ├── DEMO.md                 # 5-minute demo flow
 │   └── DATA_SOURCES.md         # PDF download guide
 ├── notebooks/                  # RAG workflow notebook
@@ -52,9 +57,12 @@ FinancialIntelligenceCopilot/
 ├── scripts/                    # Index build, retrieval and RAGAS evaluation scripts
 ├── src/                        # Core Python modules
 ├── tests/                      # Phase checkpoint tests
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt            # Production dependencies
 ├── requirements-dev.txt        # + pytest and RAGAS (dev/eval only)
 ├── .env.example
+├── LICENSE
 └── README.md
 ```
 
@@ -80,20 +88,30 @@ FinancialIntelligenceCopilot/
 | 5 | LLM Generator | ✅ Complete |
 | 6 | Chat UI (Streamlit, since replaced by the FastAPI-served web UI) | ✅ Complete |
 | 7 | Containerization (Docker) | ✅ Complete |
+| 8 | Corpus Ops | ✅ Complete |
+| 9 | Confidence Gate + Metadata Propagation | ✅ Complete |
+| 10 | Hardening, Resume Unification, Cleanup | ✅ Complete |
+| 11 | Evaluation, Hybrid Default, Cleanup | ✅ Complete |
 
 Run scaffold test: `pytest tests/test_phase0_scaffold.py -v`  
 Full spec: [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)
 
-### **3-Command Quickstart**
+### **Quickstart**
+Requires Python 3.11.
 ```powershell
+git clone https://github.com/jegadeesh17/FinancialIntelligenceCopilot.git
 cd FinancialIntelligenceCopilot
-pip install -r requirements.txt
-cp .env.example .env   # add OPENROUTER_API_KEY
+python -m venv .venv
+.venv\Scripts\activate             # Git Bash: source .venv/Scripts/activate
+pip install -r requirements.txt    # requirements-dev.txt also adds pytest and RAGAS
+cp .env.example .env               # add OPENROUTER_API_KEY
 python scripts/build_index.py
 uvicorn api.main:app --port 8000   # then open http://localhost:8000/app
 ```
 
-Interactive API docs are at `/docs`. If `API_KEY` is set in `.env`, call `/ask` with header `x-api-key: <your-key>`.
+Run the tests with `pytest -q`. To explore the pipeline step by step, open `notebooks/FinancialIntelligenceCopilot.ipynb`.
+
+Interactive API docs are at `/docs`; see [docs/API.md](docs/API.md) for the full reference. If `API_KEY` is set in `.env`, call `/ask` with header `x-api-key: <your-key>`.
 
 **Retrieval evaluation:**
 ```powershell
@@ -144,7 +162,7 @@ See [docs/DEMO.md](docs/DEMO.md) for a 5-minute interview demo flow.
 **Quick demo loop:**
 1. Run `python scripts/build_index.py` after adding PDFs to `data/raw_pdfs/`.
 2. Ask a regulatory, annual report, or exam-reference question in the web UI (`/app`).
-3. Use source excerpts in debug mode to validate retrieved context quality.
+3. Check the cited document and page under each answer.
 
 ---
 ```powershell
@@ -168,14 +186,6 @@ docker compose up --build
 | Deploy | Docker → GCP Cloud Run via GitHub Actions |
 
 ---
-### **Getting Started**
-1. **Clone:** `git clone https://github.com/jegadeesh17/FinancialIntelligenceCopilot.git`
-2. **Install:** `pip install -r requirements-dev.txt` (runtime only: `requirements.txt`)
-3. **Configure:** `cp .env.example .env` and add your OpenRouter API key
-4. **Test scaffold:** `pytest tests/test_phase0_scaffold.py -v`
-5. **Notebook:** Open `notebooks/FinancialIntelligenceCopilot.ipynb`
-
----
 ### **Example Use Case**
 A compliance analyst at a bank receives an updated RBI Master Direction on KYC requirements. Instead of reading 80 pages, they ask: *"What KYC documents are required for individual customers?"* The system retrieves the relevant paragraph, generates a grounded answer, and cites **RBI_Master_Direction_KYC.pdf, Page 12**.
 
@@ -190,4 +200,4 @@ A compliance analyst at a bank receives an updated RBI Master Direction on KYC r
 
 ---
 ### **License**
-MIT
+MIT, see [LICENSE](LICENSE).

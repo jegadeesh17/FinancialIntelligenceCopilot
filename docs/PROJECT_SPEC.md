@@ -7,12 +7,12 @@
 | Field | Value |
 |-------|-------|
 | **Document** | PROJECT_SPEC.md |
-| **Version** | 2.0 |
-| **Status** | Active — Dual-vertical build in progress |
-| **Last updated** | 2026-07-09 |
+| **Version** | 2.2 |
+| **Status** | Active — Deployed (Cloud Run) |
+| **Last updated** | 2026-10-03 |
 | **Repository** | [github.com/jegadeesh17/FinancialIntelligenceCopilot](https://github.com/jegadeesh17/FinancialIntelligenceCopilot) |
 | **Project folder** | `FinancialIntelligenceCopilot` |
-| **Related docs** | [README.md](../README.md), [PHASE_LOG.md](./PHASE_LOG.md) |
+| **Related docs** | [README.md](../README.md), [PHASE_LOG.md](./PHASE_LOG.md), [DEPLOYMENT.md](./DEPLOYMENT.md), [API.md](./API.md) |
 
 ---
 
@@ -114,7 +114,7 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
                        │  vector store│
                        └──────┬───────┘
                               │
-User Question ──▶ Retriever ──┘
+User Question ──▶ Retriever ──┘   (dense vectors + BM25 keyword index, fused via RRF)
                       │
                       ▼
                Top-5 Chunks ──▶ OpenRouter LLM ──▶ Answer + Citations
@@ -170,20 +170,33 @@ User query ──▶ src/retriever.py ──▶ top-k chunks
 | Chunk size / overlap | ✅ Locked | 800 / 100 chars, paragraph-aware |
 | Top-k retrieval | ✅ Locked | 5 chunks |
 | Initial PDFs | ✅ Locked | 3 (1 RBI circular + 1 HDFC Bank annual report + 1 SEBI circular) |
-| Full corpus target | ✅ Locked | 15–20 PDFs by Phase 6 |
+| Full corpus | ✅ Finalized | 12 PDFs (see [DATA_SOURCES.md](./DATA_SOURCES.md)) |
 
 ### Environment Variables (`.env`)
 
+Defaults come from `configs/settings.py`; `.env.example` is the template.
+
 ```env
+ENVIRONMENT=development
+LOG_LEVEL=INFO
 LLM_PROVIDER=openrouter
 OPENROUTER_API_KEY=sk-or-v1-...
 OPENROUTER_MODEL=openrouter/free
+OPENROUTER_FALLBACK_MODELS=
+LLM_MAX_RETRIES=3
+PORTKEY_API_KEY=
+PORTKEY_GATEWAY_URL=https://api.portkey.ai/v1
 CHROMA_PERSIST_DIR=data/chroma_db
 RAW_PDF_DIR=data/raw_pdfs
 EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 CHUNK_SIZE=800
 CHUNK_OVERLAP=100
 TOP_K=5
+LOW_CONFIDENCE_DISTANCE=0.85
+ENABLE_HYBRID_SEARCH=true
+HYBRID_ALPHA=0.5
+API_KEY=
+API_RATE_LIMIT_PER_MINUTE=60
 ```
 
 ---
@@ -222,7 +235,8 @@ TOP_K=5
 | **7** | Containerization (Docker) | ✅ Complete | `pytest tests/test_phase7_docker.py -v` |
 | **8** | Corpus Ops | ✅ Complete | `python scripts/build_index.py` |
 | **9** | Confidence Gate + Metadata Propagation | ✅ Complete | `pytest tests/test_phase2_ingest.py tests/test_phase4_retriever.py tests/test_api.py -q` |
-| **10** | Hardening, Resume Unification, Cleanup | 🟡 In Progress | pending |
+| **10** | Hardening, Resume Unification, Cleanup | ✅ Complete | `pytest -q` |
+| **11** | Evaluation, Hybrid Default, Cleanup | ✅ Complete | `pytest -q` |
 
 **Status legend:** ⬜ Pending → 🟡 In Progress → ✅ Complete
 
@@ -240,35 +254,55 @@ pytest -v                    # unit tests only (default)
 pytest -m integration -v     # live API + real PDFs
 ```
 
+CI (`.github/workflows/ci.yml`) runs `pytest -m "not integration" -q` on every push and pull request.
+
 ---
 
 ## 9. File Manifest
 
 ```text
 FinancialIntelligenceCopilot/
-├── api/                        # FastAPI + web UI
+├── .github/workflows/          # ci.yml (tests), deploy.yml (Cloud Run)
+├── api/                        # FastAPI (main.py) + web UI (index.html)
+├── configs/settings.py         # Pydantic settings
 ├── data/raw_pdfs/              # gitignored
 ├── data/chroma_db/             # gitignored
+├── data/eval_questions.json    # evaluation question set
 ├── docs/
 │   ├── PROJECT_SPEC.md
-│   └── PHASE_LOG.md
+│   ├── PHASE_LOG.md
+│   ├── DEPLOYMENT.md
+│   ├── API.md
+│   ├── DEMO.md
+│   └── DATA_SOURCES.md
 ├── notebooks/FinancialIntelligenceCopilot.ipynb
-├── scripts/download_docs.py
+├── reports/                    # retrieval, benchmark and RAGAS reports
+├── scripts/
+│   ├── build_index.py
+│   ├── download_docs.py
+│   ├── eval_retrieval.py
+│   ├── eval_rag_metrics.py
+│   └── eval_ragas.py
 ├── src/
 │   ├── config.py
 │   ├── schemas.py
 │   ├── ingest_docs.py
 │   ├── embeddings.py
 │   ├── vectorstore.py
+│   ├── indexing.py
 │   ├── retriever.py
 │   ├── generator.py
 │   ├── rag_pipeline.py
-│   └── chat.py
-├── tests/test_phase1_setup.py … test_phase7_docker.py
+│   ├── corpus_stats.py
+│   └── telemetry.py
+├── tests/                      # test_phaseN_*.py, test_api.py and others
 ├── docker-compose.yml
 ├── Dockerfile
 ├── .env.example
+├── LICENSE
 ├── requirements.txt
+├── requirements-dev.txt
+├── runtime.txt
 ├── pytest.ini
 └── README.md
 ```
@@ -290,3 +324,4 @@ FinancialIntelligenceCopilot/
 | 2026-07-07 | 1.8 | Phase 7 complete — Dockerfile, compose stack, and containerization tests |
 | 2026-07-09 | 2.0 | Added dual-vertical architecture, scraping ops scripts, confidence gate, metadata propagation, and corpus coverage surfaces |
 | 2026-10-03 | 2.1 | RAGAS evaluation added, Streamlit UI removed, dev/prod requirements split, `GET /eval` + web UI Eval metrics popover |
+| 2026-10-03 | 2.2 | Docs refresh: LICENSE, DEPLOYMENT.md, API.md, manifest and env sync |
