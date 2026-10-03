@@ -53,6 +53,8 @@ curl https://financial-copilot-api-242711953247.asia-south1.run.app/health
 
 Expect `"status": "ok"` and a non-zero `chunk_count`. The UI is at `/app`.
 
+`GET /eval` serves the `reports/*.json` committed at deploy time; re-running evals changes the live popover only after the next deploy.
+
 ## Roll back
 
 List revisions, then send all traffic to a previous one:

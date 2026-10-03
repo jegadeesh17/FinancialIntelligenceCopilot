@@ -10,7 +10,9 @@
 **Full specification:** [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)  
 **Learning log:** [docs/PHASE_LOG.md](docs/PHASE_LOG.md)  
 **API reference:** [docs/API.md](docs/API.md)  
-**Deployment guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+**Deployment guide:** [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)  
+**Evaluation methodology:** [docs/EVALUATIONS.md](docs/EVALUATIONS.md)  
+**Design decisions:** [docs/DECISIONS.md](docs/DECISIONS.md)
 
 ---
 ### **Key Features**
@@ -50,6 +52,8 @@ FinancialIntelligenceCopilot/
 │   ├── PHASE_LOG.md            # Per-phase learning notes
 │   ├── API.md                  # Endpoint reference
 │   ├── DEPLOYMENT.md           # Cloud Run pipeline, secrets, rollback
+│   ├── EVALUATIONS.md          # Eval methodology, results, failure analysis
+│   ├── DECISIONS.md            # Architecture decision records
 │   ├── DEMO.md                 # 5-minute demo flow
 │   └── DATA_SOURCES.md         # PDF download guide
 ├── notebooks/                  # RAG workflow notebook
@@ -92,6 +96,7 @@ FinancialIntelligenceCopilot/
 | 9 | Confidence Gate + Metadata Propagation | ✅ Complete |
 | 10 | Hardening, Resume Unification, Cleanup | ✅ Complete |
 | 11 | Evaluation, Hybrid Default, Cleanup | ✅ Complete |
+| 12 | Evaluation Fixes and Documentation | ✅ Complete |
 
 Run scaffold test: `pytest tests/test_phase0_scaffold.py -v`  
 Full spec: [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md)
@@ -128,10 +133,10 @@ python scripts/eval_retrieval.py
 
 | Metric (top-5, n=10) | Dense | Hybrid (BM25 + RRF) |
 | :--- | :---: | :---: |
-| Hit rate | 70.0% (7/10) | 70.0% (7/10) |
-| MRR | 0.525 | 0.550 |
-| Precision@5 | 0.380 | 0.360 |
-| P95 latency (local CPU, warm) | 39.7 ms | 43.9 ms |
+| Hit rate | 100.0% (10/10) | 100.0% (10/10) |
+| MRR | 0.678 | 0.703 |
+| Precision@5 | 0.520 | 0.460 |
+| P95 latency (local CPU, warm) | 52.3 ms | 42.4 ms |
 
 ---
 ### **Answer-quality evaluation**
@@ -140,20 +145,24 @@ python scripts/eval_retrieval.py
 - Report: `reports/ragas_eval.json` and [reports/RAGAS_EVAL.md](reports/RAGAS_EVAL.md)
 - Also shown live in the app: click **Eval metrics** (top right of the [web UI](https://financial-copilot-api-242711953247.asia-south1.run.app/app)), backed by `GET /eval`.
 - Generator: `openai/gpt-oss-20b` (paid endpoint, no fallbacks). Judge: `deepseek/deepseek-v4.1-flash` via OpenRouter, with local MiniLM embeddings. RAGAS 0.4.3.
+- Methodology, how to re-run, and how to read the scores: [docs/EVALUATIONS.md](docs/EVALUATIONS.md)
 
 | Metric (mean, n=10) | Dense | Hybrid (BM25 + RRF) |
 | :--- | :---: | :---: |
-| Faithfulness | 0.620 | 0.627 |
-| Response relevancy | 0.489 | 0.696 |
-| Context precision (no reference) | 0.353 | 0.228 |
+| Faithfulness | 0.744 | 0.788 |
+| Response relevancy | 0.509 | 0.541 |
+| Context precision (no reference) | 0.470 | 0.287 |
 | NaN scores / generation failures | 0 / 0 | 0 / 0 |
 
 **Caveats**
 - Small sample: with n=10, one question moves a mean by 0.1, so differences between dense and hybrid are not statistically meaningful.
 - The judge is a single LLM and is noisy. Response relevancy is computed from 1 generated question per answer, not 3, because OpenRouter ignores the `n` parameter.
-- The retrieval eval uses wide `expected_page` ranges (for example 1–500 for the annual report), so its hit rate is lenient.
-- In the lowest-faithfulness rows (HDFC numeric questions), the needed figures were not in the retrieved chunks and the generator stated numbers anyway.
-- Free-tier generation (`openrouter/free`) was tried first and rejected: 1/10 (dense) and 5/10 (hybrid) answers were generation failures, so those runs are not reported.
+- The retrieval eval uses wide `expected_page` ranges (for example 1–500 for the annual report), so its hit rate is lenient: `kyc-001` counts as a hit although the retrieved chunks do not contain the identification-document list.
+- Refusals ("the context does not contain…") score 0 on response relevancy by RAGAS design. Eight of the 20 answers did (four per mode), so relevancy penalises correct abstention.
+- Lowest-faithfulness answers have two causes (failure analysis in [docs/EVALUATIONS.md](docs/EVALUATIONS.md)): the generator stated figures or steps that are not in the retrieved text (`hdfc-002`, `aml-002`), or retrieval returned the right document but not the needed passage (`kyc-001`, `capital-001`).
+- The RAGAS runs use `openai/gpt-oss-20b`. The live deployment uses the default `openrouter/free` model, so these scores describe the pipeline with the eval generator, not the live model.
+- Free-tier generation (`openrouter/free`) was tried first and rejected for evaluation: 1/10 (dense) and 5/10 (hybrid) answers were generation failures, so those runs are not reported.
+- The eval set was corrected on 2026-10-03: three questions pointed at PDFs that were never in the corpus and now point at documents that are. Earlier numbers are not comparable.
 
 ---
 ### **Demo Script**
@@ -190,9 +199,20 @@ docker compose up --build
 A compliance analyst at a bank receives an updated RBI Master Direction on KYC requirements. Instead of reading 80 pages, they ask: *"What KYC documents are required for individual customers?"* The system retrieves the relevant paragraph, generates a grounded answer, and cites **RBI_Master_Direction_KYC.pdf, Page 12**.
 
 ---
+### **Known Limitations**
+- No OCR: scanned PDFs are not supported.
+- Evaluation limits: n=10, a single LLM judge, wide page ranges, no reference answers, and the eval generator differs from production. See [docs/EVALUATIONS.md](docs/EVALUATIONS.md).
+- The rate limit is in-memory and per instance, so it is not shared across Cloud Run instances.
+- There is no authentication beyond the optional `API_KEY` header.
+- Production runs the free-tier `openrouter/free` model, which is less reliable than the paid model used for evaluation.
+
+---
 ### **Future Improvements**
 - OCR for scanned PDFs
 - Multi-collection routing (regulatory vs. filings)
+- Reference answers, enabling Context Recall and answer-correctness scoring
+- A larger eval set
+- Scheduled evaluation runs
 
 ---
 ### **Contributors**

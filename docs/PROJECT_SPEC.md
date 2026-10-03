@@ -7,12 +7,12 @@
 | Field | Value |
 |-------|-------|
 | **Document** | PROJECT_SPEC.md |
-| **Version** | 2.2 |
+| **Version** | 2.3 |
 | **Status** | Active — Deployed (Cloud Run) |
 | **Last updated** | 2026-10-03 |
 | **Repository** | [github.com/jegadeesh17/FinancialIntelligenceCopilot](https://github.com/jegadeesh17/FinancialIntelligenceCopilot) |
 | **Project folder** | `FinancialIntelligenceCopilot` |
-| **Related docs** | [README.md](../README.md), [PHASE_LOG.md](./PHASE_LOG.md), [DEPLOYMENT.md](./DEPLOYMENT.md), [API.md](./API.md) |
+| **Related docs** | [README.md](../README.md), [PHASE_LOG.md](./PHASE_LOG.md), [DEPLOYMENT.md](./DEPLOYMENT.md), [API.md](./API.md), [EVALUATIONS.md](./EVALUATIONS.md), [DECISIONS.md](./DECISIONS.md) |
 
 ---
 
@@ -172,6 +172,8 @@ User query ──▶ src/retriever.py ──▶ top-k chunks
 | Initial PDFs | ✅ Locked | 3 (1 RBI circular + 1 HDFC Bank annual report + 1 SEBI circular) |
 | Full corpus | ✅ Finalized | 12 PDFs (see [DATA_SOURCES.md](./DATA_SOURCES.md)) |
 
+Rationale: see [DECISIONS.md](./DECISIONS.md).
+
 ### Environment Variables (`.env`)
 
 Defaults come from `configs/settings.py`; `.env.example` is the template.
@@ -205,11 +207,14 @@ API_RATE_LIMIT_PER_MINUTE=60
 
 ### 6.1 Corpus (Compliance-First Mixed)
 
-| Class | Share | Examples |
-|-------|-------|----------|
-| Regulatory circulars | ~40% | RBI Master Directions, SEBI circulars |
-| Annual reports / 10-K | ~40% | HDFC Bank annual report, Reliance annual report |
-| Insurance guidelines | ~20% | IRDAI guidelines |
+| Class | PDFs | Examples |
+|-------|------|----------|
+| Annual reports | 5 | HDFC Bank, ICICI Bank, Reliance, Tata Consumer Products, TCS |
+| Regulatory (RBI + SEBI) | 4 | RBI KYC and fraud-reporting Master Directions, SEBI disclosure and LODR circulars |
+| Insurance (IRDAI) | 2 | Life insurance products and investment master circulars |
+| Exam reference | 1 | NISM Series XV Research Analyst workbook |
+
+File names and sources: [DATA_SOURCES.md](./DATA_SOURCES.md).
 
 ### 6.2 Sample Evaluation Questions
 
@@ -217,6 +222,8 @@ API_RATE_LIMIT_PER_MINUTE=60
 - *"What KYC documents are required for individual customers?"*
 - *"What is HDFC Bank's net interest income?"*
 - *"What is HDFC Bank's total deposits as per the annual report?"*
+
+Full eval set: `data/eval_questions.json`; methodology in [EVALUATIONS.md](./EVALUATIONS.md).
 
 ---
 
@@ -256,6 +263,8 @@ pytest -m integration -v     # live API + real PDFs
 
 CI (`.github/workflows/ci.yml`) runs `pytest -m "not integration" -q` on every push and pull request.
 
+**Evaluation.** Retrieval and RAGAS answer-quality evals (`scripts/eval_retrieval.py`, `scripts/eval_rag_metrics.py`, `scripts/eval_ragas.py`) are run manually and are not part of CI, because they cost paid OpenRouter credits and need network access. Methodology, how to re-run, and latest results: [EVALUATIONS.md](./EVALUATIONS.md).
+
 ---
 
 ## 9. File Manifest
@@ -273,6 +282,8 @@ FinancialIntelligenceCopilot/
 │   ├── PHASE_LOG.md
 │   ├── DEPLOYMENT.md
 │   ├── API.md
+│   ├── EVALUATIONS.md
+│   ├── DECISIONS.md
 │   ├── DEMO.md
 │   └── DATA_SOURCES.md
 ├── notebooks/FinancialIntelligenceCopilot.ipynb
@@ -325,3 +336,4 @@ FinancialIntelligenceCopilot/
 | 2026-07-09 | 2.0 | Added dual-vertical architecture, scraping ops scripts, confidence gate, metadata propagation, and corpus coverage surfaces |
 | 2026-10-03 | 2.1 | RAGAS evaluation added, Streamlit UI removed, dev/prod requirements split, `GET /eval` + web UI Eval metrics popover |
 | 2026-10-03 | 2.2 | Docs refresh: LICENSE, DEPLOYMENT.md, API.md, manifest and env sync |
+| 2026-10-03 | 2.3 | Eval set and benchmark report fixed, evals re-run, EVALUATIONS.md and DECISIONS.md added |
