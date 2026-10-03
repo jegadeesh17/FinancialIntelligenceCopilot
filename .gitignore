@@ -32,3 +32,17 @@ logs/*
 *.7z
 *.tar.gz
 *.gz
+
+# Secrets and keys
+.env.*
+!.env.example
+*.pem
+*.key
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Superseded docs (kept on disk, out of git) and local orchestration notes
+docs/archive/
+docs/orchestrate/
