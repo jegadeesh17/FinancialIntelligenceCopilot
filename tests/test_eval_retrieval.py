@@ -45,7 +45,7 @@ class TestEvalRetrieval:
             if "governance" in question.lower():
                 return [
                     RetrievalResult(
-                        source="sebi_lodr_governance.pdf",
+                        source="sebi_lodr_ncd_operational_circular.pdf",
                         page=2,
                         text="Governance text",
                         chunk_index=0,
@@ -65,7 +65,7 @@ class TestEvalRetrieval:
             if "AML" in question or "money laundering" in question.lower():
                 return [
                     RetrievalResult(
-                        source="rbi_master_direction_aml.pdf",
+                        source="rbi_master_direction_kyc.pdf",
                         page=3,
                         text="AML text",
                         chunk_index=0,
