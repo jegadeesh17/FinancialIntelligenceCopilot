@@ -51,22 +51,22 @@
   {
     "id": "aml-001",
     "question": "What are AML and CFT requirements mentioned in RBI master directions?",
-    "expected_doc": "rbi_master_direction_aml",
+    "expected_doc": "rbi_master_direction_kyc",
     "expected_page_min": 1,
-    "expected_page_max": 40
+    "expected_page_max": 75
   },
   {
     "id": "aml-002",
     "question": "What customer due diligence steps are required under anti money laundering rules?",
-    "expected_doc": "rbi_master_direction_aml",
+    "expected_doc": "rbi_master_direction_kyc",
     "expected_page_min": 1,
-    "expected_page_max": 40
+    "expected_page_max": 50
   },
   {
     "id": "lodr-001",
     "question": "What corporate governance disclosures are required under SEBI listing obligations?",
-    "expected_doc": "sebi_lodr_governance",
+    "expected_doc": "sebi_lodr_ncd_operational_circular",
     "expected_page_min": 1,
-    "expected_page_max": 30
+    "expected_page_max": 75
   }
 ]

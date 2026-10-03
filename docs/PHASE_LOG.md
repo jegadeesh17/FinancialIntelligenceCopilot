@@ -299,7 +299,7 @@ streamlit run app/app.py
 
 ---
 
-## Tomorrow Plan — Remaining Phases (2026-07-09 Morning)
+## Phase 10 Sub-phases (completed 2026-07-09)
 
 **All items below completed on 2026-07-09.**
 
@@ -314,10 +314,31 @@ streamlit run app/app.py
 ## Phase 11 — Evaluation, Hybrid Default, and Cleanup (2026-10-03)
 
 - Hybrid BM25 + dense retrieval (RRF) is the default in the API (`ENABLE_HYBRID_SEARCH`).
-- Added `scripts/eval_ragas.py`: RAGAS faithfulness, response relevancy and context precision, judged by `deepseek/deepseek-v4.1-flash`, generator `openai/gpt-oss-20b`. Results (n=10, dense / hybrid): faithfulness 0.620 / 0.627, relevancy 0.489 / 0.696, context precision 0.353 / 0.228. Reports: `reports/ragas_eval.json`, `reports/RAGAS_EVAL.md`.
+- Added `scripts/eval_ragas.py`: RAGAS faithfulness, response relevancy and context precision, judged by `deepseek/deepseek-v4.1-flash`, generator `openai/gpt-oss-20b`. Results (n=10, dense / hybrid): faithfulness 0.620 / 0.627, relevancy 0.489 / 0.696, context precision 0.353 / 0.228. Reports: `reports/ragas_eval.json`, `reports/RAGAS_EVAL.md`. (Superseded: Phase 12 corrected the eval set and re-ran everything; these numbers are no longer current.)
 - Lesson: the free `openrouter/free` generator was unreliable (1/10 dense and 5/10 hybrid answers were generation failures scored 0.0), so evaluation uses one fixed paid model.
-- Lesson: in the lowest-faithfulness HDFC numeric questions the retrieved chunks did not contain the figures, and the generator stated numbers anyway.
+- Lesson: in the lowest-faithfulness HDFC numeric questions the retrieved chunks did not contain the figures, and the generator stated numbers anyway. (Refined in Phase 12: the deposits table was in the chunks, and the generator misread it.)
 - Fixed latency benchmarking: added a warm-up call so model load is no longer counted (P95 dense 7,483 ms -> 39.7 ms) and replaced a hard-coded "<150 ms SLA" claim with measured values.
 - Removed the Streamlit UI (`app/`, `src/chat.py`, `src/ui_styles.py`, Streamlit tests, compose service). The FastAPI-served web UI is the only UI.
 - Split `requirements-dev.txt` (pytest, RAGAS) from `requirements.txt` so the production image stays lean.
 - Added `GET /eval` and an "Eval metrics" popover in the web UI; refreshed the front page header and compacted the layout to one screen.
+
+---
+
+## Phase 12 — Evaluation Fixes and Documentation (2026-10-03)
+
+**What we built**
+- Fixed `scripts/eval_rag_metrics.py`: the "Expected Source Document" column printed the question text instead of the document, and the docstring and footer cited a standards file that does not exist.
+- Fixed the eval set: `aml-001`, `aml-002` and `lodr-001` expected PDFs that were never in `data/raw_pdfs/`. They now point at `rbi_master_direction_kyc` and `sebi_lodr_ncd_operational_circular`. Question text and ids are unchanged.
+- Re-ran all four evals (retrieval, benchmark, RAGAS dense, RAGAS hybrid) with the same generator and judge as Phase 11.
+- Added `docs/EVALUATIONS.md` (methodology, how to re-run, results, failure analysis, limitations) and `docs/DECISIONS.md` (architecture decision records), and synced README, spec, demo, deployment and notebook text.
+
+**Lessons**
+- Validate that every eval target exists in the corpus. Three of ten questions could never hit, and one of them was answered from model memory.
+- A hit on a wide page range does not mean the needed passage was retrieved (`kyc-001` hits, but the chunks lack the identification-document list).
+- RAGAS response relevancy scores a refusal as 0, so it penalises correct abstention. Eight of 20 answers were refusals.
+- The eval generator (`openai/gpt-oss-20b`) differs from the production generator (`openrouter/free`), so RAGAS scores do not describe the live model.
+
+**Results** (n=10, dense / hybrid; see [EVALUATIONS.md](./EVALUATIONS.md))
+- Retrieval: Hit@5 100.0% / 100.0%, MRR 0.678 / 0.703, Precision@5 0.520 / 0.460, P95 latency 52.3 ms / 42.4 ms.
+- RAGAS: faithfulness 0.744 / 0.788, response relevancy 0.509 / 0.541, context precision 0.470 / 0.287. 0 NaN scores and 0 generation failures in both runs.
+- Earlier results are not comparable because the eval set changed.

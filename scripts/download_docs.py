@@ -41,20 +41,6 @@ DOCUMENTS: list[dict[str, str]] = [
         "url": "https://www.sebi.gov.in/sebi_data/attachdocs/1486375066836.pdf",
         "note": "SEBI LODR circular — Business Responsibility Report (disclosure)",
     },
-    {
-        "filename": "rbi_master_direction_aml.pdf",
-        "url": (
-            "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=11566"
-        ),
-        "note": "RBI Master Direction — AML/CFT (download manually if URL fails)",
-        "optional": True,
-    },
-    {
-        "filename": "sebi_lodr_governance.pdf",
-        "url": "https://www.sebi.gov.in/legal/circulars/2023/aug/corporate-governance-disclosures.pdf",
-        "note": "SEBI LODR governance circular (download manually if URL fails)",
-        "optional": True,
-    },
 ]
 
 TIMEOUT = httpx.Timeout(120.0, connect=15.0)

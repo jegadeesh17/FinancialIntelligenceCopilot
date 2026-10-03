@@ -22,7 +22,7 @@ Add PDFs manually to `data/raw_pdfs/` — see [DATA_SOURCES.md](DATA_SOURCES.md)
 3. **Annual report question** — *"What was HDFC Bank net interest income?"*
 4. **Exam reference question** — *"What are research analyst conflict-of-interest rules?"*
 5. **Citations** — show the source documents and pages under each answer.
-6. **Quality metrics** — click **Eval metrics** (top right) to show RAGAS faithfulness / relevancy / context precision and retrieval hit rate for dense vs hybrid.
+6. **Quality metrics** — click **Eval metrics** (top right) to show RAGAS faithfulness / relevancy / context precision and retrieval hit rate for dense vs hybrid. Talking points (why a separate judge, why no ContextRecall, why refusals score 0): [EVALUATIONS.md](EVALUATIONS.md).
 
 ## Rebuild index after PDF changes
 
