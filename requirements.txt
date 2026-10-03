@@ -17,12 +17,6 @@ beautifulsoup4
 # Phase 4 — hybrid BM25 + dense retrieval (Reciprocal Rank Fusion)
 rank-bm25>=0.2.2
 
-# Phase 6 — chat UI
-streamlit>=1.40.2
-
 # Portfolio API layer
 fastapi>=0.115.6
 uvicorn>=0.32.1
-
-# Dev / testing
-pytest>=8.3.4
