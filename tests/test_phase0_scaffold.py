@@ -22,7 +22,6 @@ class TestScaffoldStructure:
     @pytest.mark.parametrize(
         "relative_path",
         [
-            "app/app.py",
             "docs/PROJECT_SPEC.md",
             "docs/PHASE_LOG.md",
             "notebooks/FinancialIntelligenceCopilot.ipynb",

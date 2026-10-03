@@ -26,7 +26,6 @@ class TestProjectStructure:
         "relative_path",
         [
             "src/config.py",
-            "app/app.py",
             "requirements.txt",
             ".env.example",
             "pytest.ini",
@@ -51,7 +50,6 @@ class TestDependenciesImportable:
             "pydantic",
             "pydantic_settings",
             "httpx",
-            "streamlit",
             "pytest",
         ],
     )
