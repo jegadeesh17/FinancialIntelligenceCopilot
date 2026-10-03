@@ -8,12 +8,12 @@ Run `python scripts/eval_retrieval.py` to regenerate this report.
 - **Target:** ≥ 70% hit rate
 
 ## Latest Results
-- **Hit rate:** 90.0% (9/10) — see `reports/retrieval_eval.json`
-- **Chunk count:** 3459
+- **Hit rate (dense):** 70.0% (7/10) — see `reports/retrieval_eval.json`
+- **Chunk count:** 12075
 - **Corpus:** varies by local `data/raw_pdfs/` contents at index-build time
 
 ## Notes
-- Eval measures **retrieval quality**, not LLM answer quality
+- Eval measures **retrieval quality**, not LLM answer quality; see [RAGAS_EVAL.md](RAGAS_EVAL.md) for answer quality and [EVALUATION_BENCHMARK.md](EVALUATION_BENCHMARK.md) for dense vs hybrid
 - Empty vector store returns 0% — run `python scripts/build_index.py` first
 - Track corpus size using `/health` and `data/chroma_db/index_meta.json` after each rebuild
 
