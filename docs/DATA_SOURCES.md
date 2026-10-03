@@ -5,7 +5,7 @@ All PDFs are stored manually in `data/raw_pdfs/` (gitignored). **Only use real P
 ## Workflow
 
 ```bash
-# 1) Add PDFs manually to data/raw_pdfs/
+# 1) Add PDFs to data/raw_pdfs/ (manually, or `python scripts/download_docs.py` for the three it knows)
 # 2) Build Chroma index
 python scripts/build_index.py
 
@@ -55,4 +55,4 @@ uvicorn api.main:app --port 8000
 
 - Text-selectable PDFs (copy/paste works)
 - English, publicly available
-- No automated PDF seeding scripts
+- `scripts/download_docs.py` can fetch only three of the 12 PDFs (`rbi_master_direction_kyc.pdf`, `hdfc_bank_annual_report.pdf`, `sebi_circular_disclosure.pdf`); the other nine must be added manually. If a URL in the script has gone stale, download that file by hand.

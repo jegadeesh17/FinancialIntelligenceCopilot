@@ -68,3 +68,5 @@ Omit the `x-api-key` header when `API_KEY` is not set on the server.
 | 422 | invalid body (empty or over-long `question`) | FastAPI validation detail |
 | 429 | rate limit exceeded | `{"detail": "Rate limit exceeded. Try again in a minute."}` |
 | 500 | any unhandled error (details are logged server-side only) | `{"error": "internal_error", "detail": "An unexpected error occurred."}` |
+
+LLM failures do not produce an error status. If every OpenRouter attempt fails (or the API key is missing), `/ask` still returns `200` with `answer` set to "I could not generate a reliable answer right now. Please try again." and empty `citations` (`src/generator.py:117-123`). When retrieval finds nothing, `answer` is "I could not find relevant context in the document corpus." A low-confidence retrieval is only flagged (`low_confidence: true`); the answer is still generated.

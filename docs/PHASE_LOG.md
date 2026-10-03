@@ -4,6 +4,8 @@
 
 Use this file to capture what you learned each phase.
 
+> **Historical log.** Entries are written as they happened and are not updated afterwards. Streamlit commands (`streamlit run app/app.py`, port 8501) and Streamlit file references no longer apply: the Streamlit UI was removed in commit `dbf2049` and the web UI is served by FastAPI at `/app`. See [README.md](../README.md) and [DECISIONS.md](./DECISIONS.md) for current behaviour.
+
 ---
 
 ## Scaffold — Project Structure & Spec

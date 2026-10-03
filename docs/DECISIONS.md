@@ -26,7 +26,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 
 ## ADR-03: ChromaDB persistent store
 
-**Context:** Chunk vectors and metadata (`source`, `page`, and later `source_url`, `regulator`, and so on) must survive between runs and be queryable by the retriever.
+**Context:** Chunk vectors and metadata (`source`, `page`, and later `retrieved_at`, `regulator` and `document_category`; `src/ingest_docs.py`, `src/retriever.py:96-113`) must survive between runs and be queryable by the retriever.
 **Decision:** Use ChromaDB as a persistent local store (`data/chroma_db/`), locked in the Scaffold phase. Upserts are batched to respect Chroma's maximum batch size (PHASE_LOG, Phase 3).
 **Alternatives rejected:** None recorded. No reason for choosing ChromaDB over other vector stores is recorded.
 **Consequences:** The index is a directory of files, gitignored, so it must be rebuilt (`python scripts/build_index.py`) or shipped separately; see ADR-08. `chromadb>=1.5.9` is pinned in `requirements.txt`.
@@ -45,7 +45,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 ## ADR-05: Hybrid BM25 + dense with RRF, on by default
 
 **Context:** Hybrid search was added in commit ce70e4e, but the API default was hardcoded to `False`, so it was never used unless a caller opted in.
-**Decision:** Fuse dense vector results with BM25 (`rank-bm25`) via Reciprocal Rank Fusion, and default `AskRequest.hybrid` to `ENABLE_HYBRID_SEARCH` (true; `HYBRID_ALPHA=0.5`) "so hybrid ... is actually used unless a caller overrides it" (commit 558e0dc).
+**Decision:** Fuse dense vector results with BM25 (`rank-bm25`) via Reciprocal Rank Fusion, and default `AskRequest.hybrid` to `ENABLE_HYBRID_SEARCH` (true) "so hybrid ... is actually used unless a caller overrides it" (commit 558e0dc). In `src/retriever.py:74-90` the dense query fetches `max(top_k * 3, 15)` = 15 candidates, BM25 re-ranks only those, and the fused order is cut to the top 5. The weighted RRF uses k=60 and a fusion weight of 0.5 that is hard-coded as the `alpha` default of `retrieve()` (`src/retriever.py:58`); the `HYBRID_ALPHA` setting exists in `configs/settings.py` but no code reads it, so changing it has no effect.
 **Alternatives rejected:** Dense-only retrieval as the default (the previous behaviour; still selectable per request).
 **Consequences:** In the latest run (n=10, top-5; see [EVALUATIONS.md](./EVALUATIONS.md)) both modes hit 10/10, hybrid has a slightly higher MRR (0.703 vs 0.678) and lower Precision@5 (0.46 vs 0.52), and P95 latency is 52.3 ms dense vs 42.4 ms hybrid, which is run-to-run noise rather than a hybrid speed-up. RAGAS shows faithfulness 0.744 vs 0.788, response relevancy 0.509 vs 0.541 and context precision 0.470 vs 0.287 (dense vs hybrid). With n=10 these differences are small and should not be read as significant.
 

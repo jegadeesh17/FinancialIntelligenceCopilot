@@ -7,7 +7,7 @@
 | Field | Value |
 |-------|-------|
 | **Document** | PROJECT_SPEC.md |
-| **Version** | 2.3 |
+| **Version** | 2.4 |
 | **Status** | Active — Deployed (Cloud Run) |
 | **Last updated** | 2026-10-03 |
 | **Repository** | [github.com/jegadeesh17/FinancialIntelligenceCopilot](https://github.com/jegadeesh17/FinancialIntelligenceCopilot) |
@@ -18,16 +18,9 @@
 
 ## 1. Executive Summary
 
-This project delivers a **practical, interview-ready Retrieval-Augmented Generation (RAG) system** with two focused verticals:
+This project is a Retrieval-Augmented Generation (RAG) system for question answering over a fixed corpus of 12 PDFs: RBI and SEBI regulatory documents, IRDAI insurance circulars, annual reports from five listed companies, and the NISM Series XV Research Analyst workbook.
 
-1. **Compliance Intelligence** (RBI/SEBI circulars and policy documents)
-2. **Earnings & Market Intelligence** (quarterly-result PDFs + market snapshot signals)
-
-The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passages, and generates **grounded, citation-backed answers** via OpenRouter. It also surfaces retrieval confidence and corpus mix health so stale evidence is detectable.
-
-**Interview pitch:**
-
-> *"I built a dual-vertical financial intelligence RAG system that combines compliance circulars and quarterly filings, uses ChromaDB retrieval with confidence gating, and answers via OpenRouter with page-level citations."*
+The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passages (dense vectors, optionally re-ranked with BM25), and generates **grounded, citation-backed answers** via OpenRouter. It returns a low-confidence flag when the best retrieval distance is above a threshold, and it reports the corpus mix by document category through `/health`.
 
 ---
 
@@ -45,8 +38,8 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | 6 | Web chat UI (`api/index.html`, served by FastAPI) with citation display (doc name + page); replaced the earlier Streamlit UI |
 | 7 | Docker containerization |
 | 8 | Per-phase pytest checkpoint tests |
-| 9 | Corpus ratio health checks for compliance vs earnings mix |
-| 10 | Corpus telemetry and confidence-oriented UX signals |
+| 9 | Corpus mix by document category (regulatory, annual report, insurance, exam reference) in `GET /health` |
+| 10 | Low-confidence flag (`low_confidence`, `best_score`) returned by `/ask` and shown in the UI |
 | 11 | Hybrid BM25 + vector search via Reciprocal Rank Fusion (enabled by default) |
 | 12 | RAGAS answer-quality evaluation (`scripts/eval_ragas.py`) surfaced in the web UI via `GET /eval` |
 
@@ -77,7 +70,7 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | FR-11 | Flag weak retrieval confidence by distance threshold | `src/retriever.py`, `src/config.py` | ✅ |
 | FR-12 | Return confidence fields in `/ask` and UI | `api/main.py`, `api/index.html` | ✅ |
 | FR-13 | Attach metadata to chunks (`retrieved_at`, `regulator`, `document_category`) | `src/ingest_docs.py`, `src/vectorstore.py` | ✅ |
-| FR-14 | Expose corpus mix summary in API health and the UI status chip | `src/corpus_stats.py`, `api/main.py`, `api/index.html` | ✅ |
+| FR-14 | Expose corpus mix summary in `GET /health`; the UI status chip shows only the indexed chunk count (`api/index.html:314`) | `src/corpus_stats.py`, `api/main.py`, `api/index.html` | ✅ |
 | FR-15 | Hybrid BM25 + dense retrieval via Reciprocal Rank Fusion, enabled by default (`ENABLE_HYBRID_SEARCH`) | `src/retriever.py`, `configs/settings.py`, `api/main.py` | ✅ |
 | FR-16 | Expose RAGAS + retrieval evaluation summary via `GET /eval` and the web UI "Eval metrics" popover | `api/main.py`, `api/index.html`, `reports/*.json` | ✅ |
 
@@ -114,7 +107,7 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
                        │  vector store│
                        └──────┬───────┘
                               │
-User Question ──▶ Retriever ──┘   (dense vectors + BM25 keyword index, fused via RRF)
+User Question ──▶ Retriever ──┘   (dense vectors; BM25 re-ranks the 15 dense candidates via weighted RRF)
                       │
                       ▼
                Top-5 Chunks ──▶ OpenRouter LLM ──▶ Answer + Citations
@@ -176,7 +169,7 @@ Rationale: see [DECISIONS.md](./DECISIONS.md).
 
 ### Environment Variables (`.env`)
 
-Defaults come from `configs/settings.py`; `.env.example` is the template.
+Defaults come from `configs/settings.py`; `.env.example` is the commented template. `ENVIRONMENT`, `LOG_LEVEL`, `LLM_PROVIDER`, `PORTKEY_API_KEY`, `PORTKEY_GATEWAY_URL` and `HYBRID_ALPHA` are defined in settings but not read by any code (the RRF weight is hard-coded to 0.5 in `src/retriever.py`).
 
 ```env
 ENVIRONMENT=development
@@ -233,6 +226,7 @@ Full eval set: `data/eval_questions.json`; methodology in [EVALUATIONS.md](./EVA
 
 | Phase | Name | Status | Checkpoint |
 |-------|------|--------|------------|
+| **0** | Scaffold & Spec | ✅ Complete | `pytest tests/test_phase0_scaffold.py -v` |
 | **1** | Project Setup & MLOps | ✅ Complete | `pytest tests/test_phase1_setup.py -v` |
 | **2** | Document Ingestion | ✅ Complete | `pytest tests/test_phase2_ingest.py -v` |
 | **3** | Embeddings & Vector Store | ✅ Complete | `pytest tests/test_phase3_vectorstore.py -v` |
@@ -244,8 +238,9 @@ Full eval set: `data/eval_questions.json`; methodology in [EVALUATIONS.md](./EVA
 | **9** | Confidence Gate + Metadata Propagation | ✅ Complete | `pytest tests/test_phase2_ingest.py tests/test_phase4_retriever.py tests/test_api.py -q` |
 | **10** | Hardening, Resume Unification, Cleanup | ✅ Complete | `pytest -q` |
 | **11** | Evaluation, Hybrid Default, Cleanup | ✅ Complete | `pytest -q` |
+| **12** | Evaluation Fixes and Documentation | ✅ Complete | `pytest -q` |
 
-**Status legend:** ⬜ Pending → 🟡 In Progress → ✅ Complete
+**Status legend:** ✅ Complete
 
 ---
 
@@ -337,3 +332,4 @@ FinancialIntelligenceCopilot/
 | 2026-10-03 | 2.1 | RAGAS evaluation added, Streamlit UI removed, dev/prod requirements split, `GET /eval` + web UI Eval metrics popover |
 | 2026-10-03 | 2.2 | Docs refresh: LICENSE, DEPLOYMENT.md, API.md, manifest and env sync |
 | 2026-10-03 | 2.3 | Eval set and benchmark report fixed, evals re-run, EVALUATIONS.md and DECISIONS.md added |
+| 2026-10-03 | 2.4 | Documentation refresh: corrected scope wording, FR-14, phase list and unused-setting notes to match the code |
