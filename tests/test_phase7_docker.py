@@ -35,8 +35,6 @@ class TestDockerArtifacts:
         # The `api` service must expose what the container actually runs
         # (uvicorn on $PORT, default 8080) — not Streamlit's port.
         assert "${PORT:-8080}:${PORT:-8080}" in compose
-        # The optional local-dev Streamlit UI is its own explicit service.
-        assert "8501:8501" in compose
         assert "./data/raw_pdfs:/app/data/raw_pdfs" in compose
         assert "./data/chroma_db:/app/data/chroma_db" in compose
 

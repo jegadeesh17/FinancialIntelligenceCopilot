@@ -1,6 +1,6 @@
 # Production RAG Retrieval Benchmark Report
 
-> **Evaluation Timestamp**: `2026-09-15 12:57:33`  
+> **Evaluation Timestamp**: `2026-10-03 21:08:40`  
 > **Total Corpus Chunks**: `12,075` chunks indexed in ChromaDB  
 > **Top-K Parameter**: `5`  
 > **Evaluation Metric Standards**: Hit Rate @ K, Mean Reciprocal Rank (MRR), Precision @ K, Latency (P50/P95)
@@ -14,8 +14,8 @@
 | **Hit Rate @ Top-5** | **70.0%** (7/10) | **70.0%** (7/10) | `+0.0%` |
 | **Mean Reciprocal Rank (MRR)** | **0.5250** | **0.5500** | `+0.0250` |
 | **Precision @ 5** | **0.3800** | **0.3600** | `-0.0200` |
-| **Avg Retrieval Latency** | **796.6 ms** | **74.4 ms** | `+-722.2 ms` |
-| **P95 Latency** | **7482.8 ms** | **165.3 ms** | `+-7317.5 ms` |
+| **Avg Retrieval Latency** | **36.4 ms** | **40.8 ms** | `+4.4 ms` |
+| **P95 Latency** | **39.7 ms** | **43.9 ms** | `+4.3 ms` |
 
 ---
 
@@ -27,7 +27,7 @@
    - Combining both via Reciprocal Rank Fusion (RRF, $k=60$) balances precision and semantic recall.
 
 2. **Latency Budget**:
-   - P95 retrieval latency remains strictly within production SLAs (< 150ms).
+   - P95 retrieval latency: dense 39.7 ms, hybrid 43.9 ms (local CPU, warm).
    - CPU-friendly execution running locally without high-end GPU requirements.
 
 ---

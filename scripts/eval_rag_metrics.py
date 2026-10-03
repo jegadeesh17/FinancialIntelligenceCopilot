@@ -58,6 +58,9 @@ def run_benchmark(top_k: int = 5) -> dict:
         latencies = []
         question_details = []
 
+        # warm-up: exclude model/client load from latency
+        retrieve(questions[0]["question"], top_k=top_k, hybrid=is_hybrid)
+
         for item in questions:
             q = item["question"]
             expected_doc = item["expected_doc"]
@@ -143,8 +146,8 @@ def generate_markdown_report(benchmark_data: dict) -> str:
 | **Hit Rate @ Top-{benchmark_data['top_k']}** | **{dense['hit_rate']*100:.1f}%** ({dense['hits']}/{dense['total']}) | **{hybrid['hit_rate']*100:.1f}%** ({hybrid['hits']}/{hybrid['total']}) | `{(hybrid['hit_rate'] - dense['hit_rate'])*100:+.1f}%` |
 | **Mean Reciprocal Rank (MRR)** | **{dense['mrr']:.4f}** | **{hybrid['mrr']:.4f}** | `{hybrid['mrr'] - dense['mrr']:+.4f}` |
 | **Precision @ {benchmark_data['top_k']}** | **{dense['avg_precision_k']:.4f}** | **{hybrid['avg_precision_k']:.4f}** | `{hybrid['avg_precision_k'] - dense['avg_precision_k']:+.4f}` |
-| **Avg Retrieval Latency** | **{dense['avg_latency_ms']:.1f} ms** | **{hybrid['avg_latency_ms']:.1f} ms** | `+{hybrid['avg_latency_ms'] - dense['avg_latency_ms']:.1f} ms` |
-| **P95 Latency** | **{dense['p95_latency_ms']:.1f} ms** | **{hybrid['p95_latency_ms']:.1f} ms** | `+{hybrid['p95_latency_ms'] - dense['p95_latency_ms']:.1f} ms` |
+| **Avg Retrieval Latency** | **{dense['avg_latency_ms']:.1f} ms** | **{hybrid['avg_latency_ms']:.1f} ms** | `{hybrid['avg_latency_ms'] - dense['avg_latency_ms']:+.1f} ms` |
+| **P95 Latency** | **{dense['p95_latency_ms']:.1f} ms** | **{hybrid['p95_latency_ms']:.1f} ms** | `{hybrid['p95_latency_ms'] - dense['p95_latency_ms']:+.1f} ms` |
 
 ---
 
@@ -156,7 +159,7 @@ def generate_markdown_report(benchmark_data: dict) -> str:
    - Combining both via Reciprocal Rank Fusion (RRF, $k=60$) balances precision and semantic recall.
 
 2. **Latency Budget**:
-   - P95 retrieval latency remains strictly within production SLAs (< 150ms).
+   - P95 retrieval latency: dense {dense['p95_latency_ms']:.1f} ms, hybrid {hybrid['p95_latency_ms']:.1f} ms (local CPU, warm).
    - CPU-friendly execution running locally without high-end GPU requirements.
 
 ---

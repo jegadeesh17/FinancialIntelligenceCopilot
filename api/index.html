@@ -34,7 +34,7 @@
             background-color: var(--bg);
             color: var(--text-1);
             min-height: 100vh;
-            padding: 2.75rem 1.25rem 4rem;
+            padding: 1.75rem 1.25rem 4rem;
             background-image:
                 radial-gradient(circle at 1px 1px, rgba(22, 32, 47, 0.05) 1px, transparent 0),
                 radial-gradient(ellipse at 50% -10%, rgba(156, 111, 40, 0.08) 0%, transparent 55%);
@@ -45,24 +45,24 @@
 
         /* Masthead */
         .masthead {
-            padding-bottom: 1.5rem;
+            padding-bottom: 1.1rem;
             border-bottom: 1px solid var(--line);
-            margin-bottom: 1.75rem;
+            margin-bottom: 1.25rem;
         }
         .util-row {
             display: flex; align-items: center; justify-content: flex-end;
-            gap: .7rem; flex-wrap: wrap; margin-bottom: 1.1rem;
+            gap: .7rem; flex-wrap: wrap; margin-bottom: .6rem; position: relative;
         }
         .brand { display: flex; align-items: center; justify-content: center; gap: .65rem; }
         .seal { flex: none; }
         .brand h1 {
-            font-family: 'Source Serif 4', serif; font-weight: 600;
-            font-size: 2rem; letter-spacing: -0.01em; color: var(--text-1);
-            line-height: 1.2;
+            font-family: 'Source Serif 4', serif; font-weight: 700;
+            font-size: clamp(2rem, 4.2vw, 3rem); letter-spacing: -0.02em; color: var(--text-1);
+            line-height: 1.1;
         }
         .tagline {
-            font-size: .95rem; line-height: 1.55; color: var(--text-2);
-            margin: .85rem auto 0; max-width: 52ch; text-align: center;
+            font-size: 1.05rem; line-height: 1.5; color: var(--text-2);
+            margin: .6rem auto 0; max-width: 62ch; text-align: center;
         }
         .status {
             display: inline-flex; align-items: center; gap: .55rem;
@@ -81,6 +81,19 @@
             transition: color .15s, border-color .15s;
         }
         .doc-link:hover { color: var(--text-1); border-color: var(--line); }
+        button.doc-link { background: transparent; font-family: inherit; cursor: pointer; }
+        .eval-pop {
+            position: absolute; top: calc(100% + .4rem); right: 0; z-index: 10;
+            width: min(420px, 92vw); padding: 1rem 1.1rem; margin: 0;
+            font-size: .8rem; color: var(--text-2); text-align: left;
+        }
+        .eval-pop[hidden] { display: none; }
+        .eval-pop table { width: 100%; border-collapse: collapse; margin-bottom: .6rem; }
+        .eval-pop th { font-weight: 500; color: var(--text-3); text-align: right; padding: 0 0 .35rem; }
+        .eval-pop th:first-child, .eval-pop td:first-child { text-align: left; }
+        .eval-pop td { padding: .3rem 0; border-top: 1px solid var(--line-soft); text-align: right; color: var(--text-1); }
+        .eval-pop td:first-child { color: var(--text-2); }
+        .eval-pop .eval-note { font-size: .74rem; color: var(--text-3); line-height: 1.45; }
 
         .panel {
             background: var(--panel);
@@ -93,7 +106,7 @@
 
         .spec-row {
             display: flex; flex-wrap: wrap; gap: .5rem 1.5rem;
-            padding: 0 0 1.1rem; margin-bottom: 1.25rem;
+            padding: 0 0 .7rem; margin-bottom: .9rem;
             border-bottom: 1px solid var(--line-soft);
             font-size: .8rem; color: var(--text-3);
         }
@@ -123,11 +136,10 @@
 
         .toggle-row {
             display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-            padding: .85rem 0; border-top: 1px solid var(--line-soft);
-            margin-bottom: 1.4rem;
+            padding: .55rem 0; border-top: 1px solid var(--line-soft);
+            margin-bottom: 1rem;
         }
         .toggle-label { font-size: .85rem; color: var(--text-1); }
-        .toggle-sub { font-size: .76rem; color: var(--text-3); display: block; margin-top: .15rem; }
 
         .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex: none; }
         .switch input { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -194,7 +206,7 @@
         .citation-snippet { font-size: .82rem; color: var(--text-3); line-height: 1.5; }
 
         @media (max-width: 560px) {
-            .brand h1 { font-size: 1.5rem; }
+            .brand h1 { font-size: 1.85rem; }
             .util-row { justify-content: space-between; }
         }
         @media (prefers-reduced-motion: reduce) {
@@ -211,23 +223,19 @@
                 <span id="statusText">Checking index…</span>
             </div>
             <a href="/docs" target="_blank" class="doc-link">API docs</a>
+            <button type="button" class="doc-link" id="evalBtn" aria-expanded="false" aria-controls="evalPop">Eval metrics</button>
+            <div class="panel eval-pop" id="evalPop" hidden></div>
         </div>
         <div class="brand">
-            <svg class="seal" width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-                <circle cx="17" cy="17" r="15" stroke="#9C6F28" stroke-width="1.2"/>
-                <circle cx="17" cy="17" r="11" stroke="#9C6F28" stroke-width="0.6" opacity="0.45"/>
-                <path d="M10.5 17.5L14.5 21.5L23.5 11.5" stroke="#9C6F28" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
             <h1>Financial Intelligence Copilot</h1>
         </div>
-        <p class="tagline">Ask about regulatory circulars, annual reports, insurance guidelines, and exam material in plain language. Every answer comes with the exact page it was drawn from, so you can verify it in seconds.</p>
+        <p class="tagline">Ask financial regulations and reports anything. Every answer cites its source page.</p>
     </header>
 
     <main class="panel">
         <div class="spec-row">
             <span>Vector store: <strong>ChromaDB + all-MiniLM-L6-v2</strong></span>
             <span>Retrieval: <strong>Reciprocal rank fusion (RRF)</strong></span>
-            <span>Corpus: <strong id="corpusStats">Connecting to your library…</strong></span>
         </div>
 
         <p class="field-label">Suggested questions</p>
@@ -246,7 +254,6 @@
             <div class="toggle-row">
                 <div>
                     <span class="toggle-label">Hybrid BM25 + dense search</span>
-                    <span class="toggle-sub">Combines keyword matching with semantic search to widen recall.</span>
                 </div>
                 <label class="switch">
                     <input type="checkbox" id="hybridToggle" checked>
@@ -278,7 +285,6 @@
 <script>
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
-    const corpusStats = document.getElementById('corpusStats');
     const ragForm = document.getElementById('ragForm');
     const questionInput = document.getElementById('questionInput');
     const hybridToggle = document.getElementById('hybridToggle');
@@ -306,9 +312,6 @@
                 const data = await res.json();
                 statusDot.className = 'dot online';
                 statusText.textContent = data.chunk_count ? `${data.chunk_count} chunks ready` : 'Ready';
-                if (data.index_metadata && data.index_metadata.chunk_count) {
-                    corpusStats.textContent = `${data.index_metadata.chunk_count} indexed chunks`;
-                }
             } else {
                 statusDot.className = 'dot offline';
                 statusText.textContent = 'Index unavailable';
@@ -319,6 +322,63 @@
         }
     }
     checkHealth();
+
+    // Evaluation popover: fetched lazily on first open so cold starts are unaffected.
+    const evalBtn = document.getElementById('evalBtn');
+    const evalPop = document.getElementById('evalPop');
+    let evalLoaded = false;
+
+    function evalCell(value, asPercent) {
+        if (value === null || value === undefined) return '—';
+        return asPercent ? `${Math.round(value * 100)}%` : Number(value).toFixed(2);
+    }
+
+    async function loadEval() {
+        try {
+            const res = await fetch('/eval');
+            if (!res.ok) throw new Error('unavailable');
+            const data = await res.json();
+            const aq = data.answer_quality || {};
+            const rt = (data.retrieval && data.retrieval.modes) || {};
+            const rows = [
+                ['Faithfulness', m => aq[m] && aq[m].means.faithfulness, false],
+                ['Response relevancy', m => aq[m] && aq[m].means.answer_relevancy, false],
+                ['Context precision', m => aq[m] && aq[m].means.llm_context_precision_without_reference, false],
+                ['Retrieval hit rate', m => rt[m] && rt[m].hit_rate, true],
+                ['Retrieval MRR', m => rt[m] && rt[m].mrr, false],
+            ];
+            const table = document.createElement('table');
+            table.innerHTML = '<thead><tr><th></th><th>Dense</th><th>Hybrid</th></tr></thead>';
+            const body = document.createElement('tbody');
+            rows.forEach(([label, pick, pct]) => {
+                const tr = document.createElement('tr');
+                [label, evalCell(pick('dense'), pct), evalCell(pick('hybrid'), pct)].forEach(text => {
+                    const td = document.createElement('td');
+                    td.textContent = text;
+                    tr.appendChild(td);
+                });
+                body.appendChild(tr);
+            });
+            table.appendChild(body);
+            const ref = aq.dense || aq.hybrid || {};
+            const note = document.createElement('p');
+            note.className = 'eval-note';
+            note.textContent = `Generator ${ref.generator_model || '—'}, judge ${ref.judge_model || '—'}. n=${ref.n_questions || '—'} questions, LLM-judged, indicative only.`;
+            evalPop.replaceChildren(table, note);
+            evalLoaded = true;
+        } catch {
+            evalPop.textContent = 'Evaluation data unavailable';
+        }
+    }
+
+    function setEvalOpen(open) {
+        evalPop.hidden = !open;
+        evalBtn.setAttribute('aria-expanded', String(open));
+        if (open && !evalLoaded) loadEval();
+    }
+    evalBtn.addEventListener('click', e => { e.stopPropagation(); setEvalOpen(evalPop.hidden); });
+    document.addEventListener('click', e => { if (!evalPop.hidden && !evalPop.contains(e.target)) setEvalOpen(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') setEvalOpen(false); });
 
     ragForm.addEventListener('submit', async (e) => {
         e.preventDefault();

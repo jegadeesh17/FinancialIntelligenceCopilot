@@ -10,3 +10,4 @@ tests
 models
 *.zip
 data/*.zip
+.venv

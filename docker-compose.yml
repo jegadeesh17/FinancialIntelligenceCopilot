@@ -21,20 +21,3 @@ services:
       timeout: 5s
       start_period: 10s
       retries: 3
-
-  # Optional local-dev Streamlit UI (app/app.py). Not part of the production
-  # image's own entrypoint — started explicitly via `docker compose --profile ui up`.
-  streamlit:
-    build: .
-    container_name: financial-compliance-ui
-    command: ["streamlit", "run", "app/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
-    ports:
-      - "8501:8501"
-    env_file:
-      - .env
-    volumes:
-      - ./data/raw_pdfs:/app/data/raw_pdfs
-      - ./data/chroma_db:/app/data/chroma_db
-    restart: unless-stopped
-    profiles:
-      - ui

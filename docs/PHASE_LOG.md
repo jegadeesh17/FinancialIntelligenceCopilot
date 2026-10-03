@@ -309,3 +309,15 @@ streamlit run app/app.py
 ### Phase 10D — Manual Verification ✅
 ### Phase 10E — AgenticMarketResearcher Archive ✅
 
+---
+
+## Phase 11 — Evaluation, Hybrid Default, and Cleanup (2026-10-03)
+
+- Hybrid BM25 + dense retrieval (RRF) is the default in the API (`ENABLE_HYBRID_SEARCH`).
+- Added `scripts/eval_ragas.py`: RAGAS faithfulness, response relevancy and context precision, judged by `deepseek/deepseek-v4.1-flash`, generator `openai/gpt-oss-20b`. Results (n=10, dense / hybrid): faithfulness 0.620 / 0.627, relevancy 0.489 / 0.696, context precision 0.353 / 0.228. Reports: `reports/ragas_eval.json`, `reports/RAGAS_EVAL.md`.
+- Lesson: the free `openrouter/free` generator was unreliable (1/10 dense and 5/10 hybrid answers were generation failures scored 0.0), so evaluation uses one fixed paid model.
+- Lesson: in the lowest-faithfulness HDFC numeric questions the retrieved chunks did not contain the figures, and the generator stated numbers anyway.
+- Fixed latency benchmarking: added a warm-up call so model load is no longer counted (P95 dense 7,483 ms -> 39.7 ms) and replaced a hard-coded "<150 ms SLA" claim with measured values.
+- Removed the Streamlit UI (`app/`, `src/chat.py`, `src/ui_styles.py`, Streamlit tests, compose service). The FastAPI-served web UI is the only UI.
+- Split `requirements-dev.txt` (pytest, RAGAS) from `requirements.txt` so the production image stays lean.
+- Added `GET /eval` and an "Eval metrics" popover in the web UI; refreshed the front page header and compacted the layout to one screen.

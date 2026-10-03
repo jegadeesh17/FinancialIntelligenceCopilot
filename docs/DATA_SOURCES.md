@@ -9,8 +9,8 @@ All PDFs are stored manually in `data/raw_pdfs/` (gitignored). **Only use real P
 # 2) Build Chroma index
 python scripts/build_index.py
 
-# 3) Run UI
-streamlit run app/app.py
+# 3) Run the API + web UI (open http://localhost:8000/app)
+uvicorn api.main:app --port 8000
 ```
 
 ---

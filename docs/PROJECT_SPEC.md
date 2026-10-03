@@ -42,19 +42,19 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | 3 | Local embeddings (`all-MiniLM-L6-v2`) + ChromaDB vector store |
 | 4 | Top-k semantic retrieval with source metadata |
 | 5 | OpenRouter LLM generation with strict context-only prompting |
-| 6 | Streamlit chat UI with citation display (doc name + page) |
+| 6 | Web chat UI (`api/index.html`, served by FastAPI) with citation display (doc name + page); replaced the earlier Streamlit UI |
 | 7 | Docker containerization |
 | 8 | Per-phase pytest checkpoint tests |
 | 9 | Corpus ratio health checks for compliance vs earnings mix |
 | 10 | Corpus telemetry and confidence-oriented UX signals |
 | 11 | Hybrid BM25 + vector search via Reciprocal Rank Fusion (enabled by default) |
+| 12 | RAGAS answer-quality evaluation (`scripts/eval_ragas.py`) surfaced in the web UI via `GET /eval` |
 
 ### 2.2 Out of Scope
 
 - Multi-user authentication / RBAC
 - Local LLM inference (OpenRouter is the locked provider)
 - OCR for scanned PDFs (text-based PDFs only)
-- Automated RAGAS / faithfulness evaluation suite (future improvement)
 
 ---
 
@@ -72,13 +72,14 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | FR-06 | Retrieve top-k similar chunks for a query | `src/retriever.py` | ✅ |
 | FR-07 | Generate grounded answer via OpenRouter | `src/generator.py` | ✅ |
 | FR-08 | End-to-end `query(question) -> RAGResponse` | `src/rag_pipeline.py` | ✅ |
-| FR-09 | Streamlit chat UI with source citations | `app/app.py` | ✅ |
+| FR-09 | Web chat UI with source citations | `api/index.html`, `api/main.py` | ✅ |
 | FR-10 | Containerized deployment | `Dockerfile`, `docker-compose.yml` | ✅ |
 | FR-11 | Flag weak retrieval confidence by distance threshold | `src/retriever.py`, `src/config.py` | ✅ |
-| FR-12 | Return confidence fields in `/ask` and UI | `api/main.py`, `app/app.py` | ✅ |
+| FR-12 | Return confidence fields in `/ask` and UI | `api/main.py`, `api/index.html` | ✅ |
 | FR-13 | Attach metadata to chunks (`retrieved_at`, `regulator`, `document_category`) | `src/ingest_docs.py`, `src/vectorstore.py` | ✅ |
-| FR-14 | Expose corpus mix summary in API health + UI sidebar | `src/corpus_stats.py`, `api/main.py`, `app/app.py` | ✅ |
+| FR-14 | Expose corpus mix summary in API health and the UI status chip | `src/corpus_stats.py`, `api/main.py`, `api/index.html` | ✅ |
 | FR-15 | Hybrid BM25 + dense retrieval via Reciprocal Rank Fusion, enabled by default (`ENABLE_HYBRID_SEARCH`) | `src/retriever.py`, `configs/settings.py`, `api/main.py` | ✅ |
+| FR-16 | Expose RAGAS + retrieval evaluation summary via `GET /eval` and the web UI "Eval metrics" popover | `api/main.py`, `api/index.html`, `reports/*.json` | ✅ |
 
 ### 3.2 Non-Functional Requirements
 
@@ -119,7 +120,7 @@ User Question ──▶ Retriever ──┘
                Top-5 Chunks ──▶ OpenRouter LLM ──▶ Answer + Citations
                       │
                       ▼
-               Streamlit Chat UI
+               Web UI (api/index.html)
 ```
 
 ### 4.2 Development Model
@@ -128,7 +129,7 @@ User Question ──▶ Retriever ──┘
 |-------|------|------|
 | Orchestrator | `notebooks/FinancialIntelligenceCopilot.ipynb` | Step-by-step lab; calls `src/` |
 | Backend | `src/*.py` | Production logic; unit-tested |
-| UI | `app/app.py` | Streamlit chat with citations |
+| UI | `api/index.html` | Static web chat with citations, served by FastAPI at `/app` |
 | Spec | `docs/PROJECT_SPEC.md` | This document |
 | Learning log | `docs/PHASE_LOG.md` | Per-phase notes |
 
@@ -151,8 +152,8 @@ User query ──▶ src/retriever.py ──▶ top-k chunks
        ▼  OpenRouter — src/generator.py
   RAGResponse {answer, citations[]}
        │
-       ▼  Streamlit — app/app.py
-  Chat UI with source sidebar
+       ▼  FastAPI + web UI — api/main.py, api/index.html
+  Chat UI with source citations
 ```
 
 ---
@@ -217,7 +218,7 @@ TOP_K=5
 | **3** | Embeddings & Vector Store | ✅ Complete | `pytest tests/test_phase3_vectorstore.py -v` |
 | **4** | Retrieval System | ✅ Complete | `pytest tests/test_phase4_retriever.py -v` |
 | **5** | LLM Generator | ✅ Complete | `pytest tests/test_phase5_generator.py -v` |
-| **6** | Streamlit Chat UI | ✅ Complete | `pytest tests/test_phase6_dashboard.py -v` |
+| **6** | Chat UI (Streamlit; later replaced by the FastAPI-served web UI) | ✅ Complete | `pytest tests/test_api.py -v` |
 | **7** | Containerization (Docker) | ✅ Complete | `pytest tests/test_phase7_docker.py -v` |
 | **8** | Corpus Ops | ✅ Complete | `python scripts/build_index.py` |
 | **9** | Confidence Gate + Metadata Propagation | ✅ Complete | `pytest tests/test_phase2_ingest.py tests/test_phase4_retriever.py tests/test_api.py -q` |
@@ -245,7 +246,7 @@ pytest -m integration -v     # live API + real PDFs
 
 ```text
 FinancialIntelligenceCopilot/
-├── app/app.py
+├── api/                        # FastAPI + web UI
 ├── data/raw_pdfs/              # gitignored
 ├── data/chroma_db/             # gitignored
 ├── docs/
@@ -288,3 +289,4 @@ FinancialIntelligenceCopilot/
 | 2026-07-07 | 1.7 | Phase 6 complete — rag_pipeline, chat helpers, Streamlit chat UI, UI tests |
 | 2026-07-07 | 1.8 | Phase 7 complete — Dockerfile, compose stack, and containerization tests |
 | 2026-07-09 | 2.0 | Added dual-vertical architecture, scraping ops scripts, confidence gate, metadata propagation, and corpus coverage surfaces |
+| 2026-10-03 | 2.1 | RAGAS evaluation added, Streamlit UI removed, dev/prod requirements split, `GET /eval` + web UI Eval metrics popover |
