@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from collections import defaultdict, deque
+import json
 import logging
 import os
 import sys
+from pathlib import Path
 from time import time
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -30,6 +32,7 @@ app = FastAPI(
     description="Citation-grounded Q&A over regulatory, annual report, insurance, and exam PDF corpus.",
     version="1.0.0",
 )
+REPORTS_DIR = Path(ROOT) / "reports"
 _REQUEST_WINDOW_SECONDS = 60
 _request_buckets: dict[str, deque[float]] = defaultdict(deque)
 
@@ -96,6 +99,40 @@ def health() -> dict:
         "corpus": corpus,
         "index_metadata": meta,
     }
+
+
+@app.get("/eval")
+def eval_summary() -> dict:
+    """Summarize the latest RAGAS answer-quality and retrieval benchmark reports."""
+    ragas_path = REPORTS_DIR / "ragas_eval.json"
+    if not ragas_path.exists():
+        raise HTTPException(status_code=404, detail="Evaluation report not available")
+    runs = json.loads(ragas_path.read_text(encoding="utf-8")).get("runs", {})
+    answer_quality = {
+        mode: {
+            "means": run["means"],
+            "nan_counts": run["nan_counts"],
+            "n_questions": run["n_questions"],
+            "generator_model": run["generator_model_config"],
+            "judge_model": run["judge_model"],
+            "ragas_version": run["ragas_version"],
+            "date": run["date"],
+        }
+        for mode, run in runs.items()
+    }
+
+    retrieval = None
+    bench_path = REPORTS_DIR / "rag_benchmark.json"
+    if bench_path.exists():
+        bench = json.loads(bench_path.read_text(encoding="utf-8"))
+        retrieval = {
+            "top_k": bench.get("top_k"),
+            "modes": {
+                mode: {key: m.get(key) for key in ("hit_rate", "mrr", "avg_precision_k", "total")}
+                for mode, m in bench.get("modes", {}).items()
+            },
+        }
+    return {"answer_quality": answer_quality, "retrieval": retrieval}
 
 
 @app.post("/ask", response_model=AskResponse)

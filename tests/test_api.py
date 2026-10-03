@@ -225,3 +225,17 @@ class TestUnhandledExceptionHandler:
         }
         assert "RuntimeError" not in response.text
         assert "super secret internal detail" not in response.text
+
+
+class TestEvalEndpoint:
+    def test_eval_returns_summary(self, client):
+        response = client.get("/eval")
+        assert response.status_code == 200
+        data = response.json()
+        assert "faithfulness" in data["answer_quality"]["dense"]["means"]
+        assert "hybrid" in data["answer_quality"]
+        assert "per_question" not in data["answer_quality"]["dense"]
+
+    def test_eval_404_when_report_missing(self, client, monkeypatch, tmp_path):
+        monkeypatch.setattr("api.main.REPORTS_DIR", tmp_path)
+        assert client.get("/eval").status_code == 404
