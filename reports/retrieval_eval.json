@@ -1,6 +1,6 @@
 {
-  "hit_rate": 0.7,
-  "hits": 7,
+  "hit_rate": 1.0,
+  "hits": 10,
   "total": 10,
   "chunk_count": 12075,
   "top_k": 5,
@@ -121,8 +121,8 @@
     {
       "id": "aml-001",
       "question": "What are AML and CFT requirements mentioned in RBI master directions?",
-      "expected_doc": "rbi_master_direction_aml",
-      "hit": false,
+      "expected_doc": "rbi_master_direction_kyc",
+      "hit": true,
       "top_sources": [
         "hdfc_bank_annual_report.pdf",
         "hdfc_bank_annual_report.pdf",
@@ -137,8 +137,8 @@
     {
       "id": "aml-002",
       "question": "What customer due diligence steps are required under anti money laundering rules?",
-      "expected_doc": "rbi_master_direction_aml",
-      "hit": false,
+      "expected_doc": "rbi_master_direction_kyc",
+      "hit": true,
       "top_sources": [
         "rbi_master_direction_kyc.pdf",
         "rbi_master_direction_kyc.pdf",
@@ -153,8 +153,8 @@
     {
       "id": "lodr-001",
       "question": "What corporate governance disclosures are required under SEBI listing obligations?",
-      "expected_doc": "sebi_lodr_governance",
-      "hit": false,
+      "expected_doc": "sebi_lodr_ncd_operational_circular",
+      "hit": true,
       "top_sources": [
         "Tata Consumer Products Ltd IAR 2025-2026.pdf",
         "tcs_annual_report.pdf",
