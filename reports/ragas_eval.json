@@ -1,0 +1,284 @@
+{
+  "runs": {
+    "dense": {
+      "mode": "dense",
+      "hybrid": false,
+      "date": "2026-10-03 18:12:37",
+      "generator_model_config": "openai/gpt-oss-20b",
+      "generator_models_used": [
+        "openai/gpt-oss-20b"
+      ],
+      "judge_model": "deepseek/deepseek-v4.1-flash",
+      "ragas_version": "0.4.3",
+      "n_questions": 10,
+      "generation_failures": 0,
+      "nan_counts": {
+        "faithfulness": 0,
+        "answer_relevancy": 0,
+        "llm_context_precision_without_reference": 0
+      },
+      "n_scored": {
+        "faithfulness": 10,
+        "answer_relevancy": 10,
+        "llm_context_precision_without_reference": 10
+      },
+      "means": {
+        "faithfulness": 0.6196,
+        "answer_relevancy": 0.4886,
+        "llm_context_precision_without_reference": 0.3533
+      },
+      "per_question": [
+        {
+          "id": "kyc-001",
+          "question": "What identification documents are required for individual customers under KYC?",
+          "answer": "The excerpts from the RBI Master Direction on KYC do not list the specific identification documents that an individual customer must provide. They refer only to \u201cmandatory information\u201d that must be collected, but the exact documents (e.g., ID proof, address proof, etc.) are not specified in the supplied context.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.4,
+          "answer_relevancy": 0.0,
+          "llm_context_precision_without_reference": 1.0
+        },
+        {
+          "id": "kyc-002",
+          "question": "What are the minimum KYC requirements for banks?",
+          "answer": "The supplied excerpts do not contain a specific list of the minimum KYC requirements that banks must meet. Therefore, I cannot provide a definitive answer based on the provided context.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.5,
+          "answer_relevancy": 0.0,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "capital-001",
+          "question": "What is the capital adequacy position reported in the annual report?",
+          "answer": "The provided context does not contain the capital adequacy position.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.0,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "hdfc-001",
+          "question": "What was HDFC Bank net interest income?",
+          "answer": "I\u2019m sorry, but the provided excerpts do not contain the absolute figure for HDFC Bank\u2019s net interest income for the year ended March\u202f31,\u202f2025.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.5,
+          "answer_relevancy": 0.0,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "hdfc-002",
+          "question": "How did total deposits change for HDFC Bank?",
+          "answer": "**Total deposits at HDFC Bank increased by\u202f\u20b935.37\u202fcrore** from the year ended\u202f31\u202fMarch\u202f2024 to the year ended\u202f31\u202fMarch\u202f2025.  \n\n- Demand deposits rose from\u202f\u20b9307.78\u202fcrore to\u202f\u20b9311.42\u202fcrore (\u2191\u202f\u20b93.65\u202fcrore).  \n- Savings\u2011bank deposits rose from\u202f\u20b9598.74\u202fcrore to\u202f\u20b9630.47\u202fcrore (\u2191\u202f\u20b931.73\u202fcrore).  \n\nAdding these two components gives the overall rise of\u202f\u20b935.37\u202fcrore in the bank\u2019s deposit base.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.0,
+          "answer_relevancy": 0.8279,
+          "llm_context_precision_without_reference": 0.5
+        },
+        {
+          "id": "sebi-001",
+          "question": "What disclosure obligations apply to listed entities under SEBI LODR?",
+          "answer": "**Disclosure obligations for listed entities under SEBI LODR**\n\n1. **Business Responsibility Report (BRR)** \u2013  \n   \u2022 Top\u2011500 listed entities must file a BRR under Regulation\u202f34(2)(f) of SEBI LODR, covering environmental, governance, stakeholder\u2011relationship, and other sustainability matters.  \n\n2. **General continuous disclosure** \u2013  \n   \u2022 Regulation\u202f4(1)(d) requires listed entities to provide \u201cadequate and timely information\u201d to recognised stock exchanges and investors, including financial results, risks and any material information.  \n\n3. **Committee and director disclosures** \u2013  \n   \u2022 Regulation\u202f26(1)(b) mandates disclosure of chairmanship/membership of the Audit Committee and the Stakeholders\u2019 Relationship Committee.  \n   \u2022 Regulation\u202f17A requires disclosure of directorships held by directors in equity\u2011listed entities (directorships in debenture\u2011listed entities are excluded).  \n\nThese obligations ensure that investors receive full, accurate, and timely information necessary for informed investment decisions.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.9474,
+          "answer_relevancy": 0.9913,
+          "llm_context_precision_without_reference": 0.3667
+        },
+        {
+          "id": "sebi-002",
+          "question": "What is the business responsibility report requirement for listed companies?",
+          "answer": "The SEBI circular mandates that the top\u202f500 listed companies in India must submit a **Business Responsibility Report (BRR)** as part of their annual disclosures. The BRR, required under Regulation\u202f34(2)(f) of the SEBI Listing Obligations and Disclosure Requirements (LOD) Regulations, must cover key areas such as environmental impact, governance practices, and stakeholder relationships.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.5534,
+          "llm_context_precision_without_reference": 0.5
+        },
+        {
+          "id": "aml-001",
+          "question": "What are AML and CFT requirements mentioned in RBI master directions?",
+          "answer": "**AML/CFT requirements in the RBI Master Directions (KYC)**  \n\n1. **Information gathering on the respondent bank** \u2013  \n   * Business nature, major activities, purpose of account opening, identity of any third\u2011party entities using correspondent services, regulatory/supervisory framework in the respondent bank\u2019s home country, and any public information on its reputation or past ML/TF investigations.  \n\n2. **Prior approval** \u2013  \n   * New correspondent banking relationships must receive prior approval from senior management; post\u2011facto approval from the Board or an empowered committee is also required.  \n\n3. **Documentation of responsibilities** \u2013  \n   * Banks must clearly document and understand the AML/CFT responsibilities of all institutions involved.  \n\n4. **Board\u2011approved policy** \u2013  \n   * A policy approved by the Board (or a committee headed by the Chairman/CEO/MD) must set parameters for approving cross\u2011border correspondent banking and similar relationships.  \n\n5. **Assessment of AML/CFT controls** \u2013  \n   * Banks must assess the respondent bank\u2019s AML/CFT controls and ensure they meet RBI standards.  \n\n6. **Compliance with stricter regulation** \u2013  \n   * If there is a variance between RBI and host\u2011country KYC/AML standards, the more stringent regulation must be adopted.  \n\nThese points collectively outline the AML and CFT requirements that banks must follow as per the RBI Master Directions.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.9524,
+          "answer_relevancy": 0.9059,
+          "llm_context_precision_without_reference": 0.4167
+        },
+        {
+          "id": "aml-002",
+          "question": "What customer due diligence steps are required under anti money laundering rules?",
+          "answer": "**Customer Due\u2011Diligence (CDD) steps required under India\u2019s AML/CFT rules**\n\n| Step | What must be done | Key points from the RBI guidance |\n|------|------------------|----------------------------------|\n| 1. **Customer Identification Procedure (CIP)** | \u2022 Collect the customer\u2019s full name, address, date of birth, and a government\u2011issued ID. <br>\u2022 Verify the authenticity of the ID and obtain a copy. | RBI Master Direction (p.\u202f22\u201123): \u201cAdequate steps are taken by REs to satisfy themselves that copies of identification data and other relevant documentation relating to the customer\u201d |\n| 2. **Record\u2011keeping** | \u2022 Keep all identification documents and transaction records for the required period. | RBI Master Direction (p.\u202f22\u201123): \u201cRecords or the information of the customer due diligence carried out by the third party is obtained immediately \u2026\u201d |\n| 3. **Risk assessment & profiling** | \u2022 Classify customers and transactions by risk level (low, medium, high). | RBI Master Direction (p.\u202f56): \u201cApply enhanced due diligence measures\u2026effective and proportionate to the risks\u201d |\n| 4. **Enhanced Due Diligence (EDD)** | \u2022 For high\u2011risk customers, high\u2011value transactions (\u2265\u202f\u20b950\u202f000), or customers from FATF\u2011high\u2011risk jurisdictions, perform additional checks (source of funds, purpose of transaction, ongoing monitoring). | RBI Master Direction (p.\u202f56) & (p.\u202f23): \u201cUltimate responsibility for customer due diligence\u2026will be with the RE\u201d |\n| 5. **Third\u2011party CDD (if used)** | \u2022 If relying on a third\u2011party\u2019s CDD, obtain the records immediately from the third party or the Central KYC Records Registry. | RBI Master Direction (p.\u202f22\u201123): \u201cREs shall at their option, rely on customer due diligence done by a third party, subject to the following conditions\u201d |\n| 6. **Ongoing monitoring & suspicious\u2011activity reporting** | \u2022 Continuously monitor transactions for unusual patterns and file SARs as required. | RBI Master Direction (p.\u202f4): \u201cRegulated Entities (REs) are required to \u2026 monitor their transactions.\u201d |\n\nThese steps collectively satisfy the customer due\u2011diligence obligations under the Prevention of Money\u2011Laundering Act, 2002 and the RBI\u2019s KYC/AML guidelines.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.0833,
+          "answer_relevancy": 0.6348,
+          "llm_context_precision_without_reference": 0.5
+        },
+        {
+          "id": "lodr-001",
+          "question": "What corporate governance disclosures are required under SEBI listing obligations?",
+          "answer": "**Corporate\u2011governance disclosures required under SEBI Listing Obligations (2015)**  \n\n| Disclosure | Key elements / where it appears |\n|------------|---------------------------------|\n| **Corporate Governance Report** | Part of the Integrated Annual Report (IAR). Includes: <br>\u2022 Board structure and committee composition (e.g., Audit, Nomination & Remuneration, Risk, etc.) <br>\u2022 Compliance with SEBI Listing Regulations (Schedule\u202fV, Part\u202fC, sub\u2011paras\u202f2\u201110) |\n| **Compliance Certificate** | Issued by a practising Company Secretary (e.g., Dr.\u202fAsim\u202fKumar\u202fChattopadhyay). Attests that the company has met all mandatory corporate\u2011governance conditions under Schedule\u202fV of the SEBI Listing Regulations. Appended as Annexure\u202f4 to the IAR. |\n| **Whistle\u2011blower Policy & Vigil Mechanism** | Must be disclosed (Regulation\u202f22 of SEBI Listing Regulations). Includes the mechanism for directors and employees to report unethical behaviour and the policy\u2019s availability on the company\u2019s website. |\n| **Details of Non\u2011Compliance** | Any penalties, strictures, or orders imposed by the stock exchange, SEBI, or other statutory authorities in the last three financial years must be disclosed (Schedule\u202fV\u202f(C)\u202f10(b)). |\n| **Board Meeting & Committee Proceedings** | Confirmation that meetings of the board and committees were conducted in accordance with SEBI (Listing Obligations and Disclosure Requirements) Regulations, 2015. |\n| **Policy Revisions** | Any revisions to materiality or related\u2011party transaction policies that align with SEBI amendments must be disclosed. |\n\nThese disclosures collectively satisfy the SEBI Listing Obligations and ensure transparency in corporate governance.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.8125,
+          "answer_relevancy": 0.973,
+          "llm_context_precision_without_reference": 0.25
+        }
+      ]
+    },
+    "hybrid": {
+      "mode": "hybrid",
+      "hybrid": true,
+      "date": "2026-10-03 18:20:03",
+      "generator_model_config": "openai/gpt-oss-20b",
+      "generator_models_used": [
+        "openai/gpt-oss-20b"
+      ],
+      "judge_model": "deepseek/deepseek-v4.1-flash",
+      "ragas_version": "0.4.3",
+      "n_questions": 10,
+      "generation_failures": 0,
+      "nan_counts": {
+        "faithfulness": 0,
+        "answer_relevancy": 0,
+        "llm_context_precision_without_reference": 0
+      },
+      "n_scored": {
+        "faithfulness": 10,
+        "answer_relevancy": 10,
+        "llm_context_precision_without_reference": 10
+      },
+      "means": {
+        "faithfulness": 0.6267,
+        "answer_relevancy": 0.6956,
+        "llm_context_precision_without_reference": 0.2283
+      },
+      "per_question": [
+        {
+          "id": "kyc-001",
+          "question": "What identification documents are required for individual customers under KYC?",
+          "answer": "The supplied excerpts do not list the specific identification documents that an individual customer must provide for KYC.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.5,
+          "answer_relevancy": 0.0,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "kyc-002",
+          "question": "What are the minimum KYC requirements for banks?",
+          "answer": "**Minimum KYC requirements for banks (as per RBI\u202fMaster Direction \u2013 KYC)**  \n\n| Requirement | Key points |\n|-------------|------------|\n| **Capture & upload of KYC records** | \u2022 Banks must capture the customer\u2019s KYC data and upload it to the Central KYC Repository (CKYCR) within **10\u202fdays** of the account\u2011based relationship commencing. <br>\u2022 Uploads must follow the KYC templates prepared by CERSAI for **Individuals** and **Legal Entities** (LEs). |\n| **Use of KYC templates** | \u2022 Templates may be revised by CERSAI; banks must use the latest version. |\n| **OTP\u2011based e\u2011KYC accounts** | \u2022 Banks must obtain a **61A declaration** that no other account has been opened or will be opened using OTP\u2011based e\u2011KYC in non\u2011face\u2011to\u2011face mode. <br>\u2022 When uploading to CKYCR, banks must clearly indicate that the account was opened via OTP\u2011based e\u2011KYC, and other banks must not open accounts based on such KYC data. |\n| **Timeframes for uploading** | \u2022 **Individual accounts** opened on or after **1\u202fJan\u202f2017** must be uploaded by SCBs (by 1\u202fFeb\u202f2017 for Jan\u20112017 accounts). <br>\u2022 **Legal Entity accounts** opened on or after **1\u202fApr\u202f2021** must be uploaded. |\n| **Compliance monitoring** | \u2022 Banks must have systems to generate alerts for non\u2011compliance/violations and ensure adherence to the KYC rules. |\n| **Special provisions for FPIs** | \u2022 For FPIs eligible under SEBI guidelines, banks can accept KYC documents as per Annex\u202fIV, subject to Income Tax (FATCA/CRS) rules, and must obtain an undertaking from the FPI or its Global Custodian to submit exempted documents when required. |\n\nThese are the core minimum KYC obligations that banks must satisfy under the RBI\u2019s KYC framework.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.9048,
+          "answer_relevancy": 0.8532,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "capital-001",
+          "question": "What is the capital adequacy position reported in the annual report?",
+          "answer": "I\u2019m sorry, but the provided context does not contain any specific figures or details about the capital adequacy position reported in the annual report.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.0,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "hdfc-001",
+          "question": "What was HDFC Bank net interest income?",
+          "answer": "HDFC Bank\u2019s net interest income for the year ended\u202f31\u202fMarch\u202f2025 was **\u20b9336,367.43\u202fcrore**.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.0,
+          "answer_relevancy": 0.908,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "hdfc-002",
+          "question": "How did total deposits change for HDFC Bank?",
+          "answer": "Total deposits rose from \u20b9906.5\u202fcrore (as of\u202f31\u202fMarch\u202f2024) to \u20b9941.9\u202fcrore (as of\u202f31\u202fMarch\u202f2025), an increase of roughly \u20b935.4\u202fcrore.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.0,
+          "answer_relevancy": 0.6527,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "sebi-001",
+          "question": "What disclosure obligations apply to listed entities under SEBI LODR?",
+          "answer": "**Disclosure obligations for listed entities under SEBI LODR**\n\n1. **Business Responsibility Report (BRR)** \u2013  \n   \u2022 Top\u2011500 listed entities must file a BRR under Regulation\u202f34(2)(f) of SEBI LODR, covering environmental, governance, stakeholder\u2011relationship and other sustainability matters.\n\n2. **Adequate & Timely Information** \u2013  \n   \u2022 Regulation\u202f4(1)(d) requires listed entities to provide \u201cadequate and timely information\u201d to recognised stock exchanges and investors, including financial results, risks and other material information (as per IOSCO Principle\u202f16).\n\n3. **Continuous Disclosures** \u2013  \n   \u2022 Entities must comply with the continuous\u2011disclosure regime of the Listing Regulations; non\u2011compliance triggers the provisions of SEBI circulars (e.g., SEBI/HO/DDHS/CIR/P/2020/231 and SEBI/HO/DDHS_Div2/P/CIR/2021/699).\n\nThese obligations ensure that listed companies disclose comprehensive, accurate, and timely information to stakeholders and regulators.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.8824,
+          "answer_relevancy": 0.9913,
+          "llm_context_precision_without_reference": 0.25
+        },
+        {
+          "id": "sebi-002",
+          "question": "What is the business responsibility report requirement for listed companies?",
+          "answer": "The SEBI Listing Regulations (Regulation\u202f34(2)(f)) require the top\u202f500 listed companies in India to submit a **Business Responsibility Report (BRR)**. The BRR must cover key areas such as environmental impact, corporate governance, and stakeholder relationships, and can be included in the annual report or presented as a separate integrated report.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 1.0,
+          "answer_relevancy": 0.7858,
+          "llm_context_precision_without_reference": 1.0
+        },
+        {
+          "id": "aml-001",
+          "question": "What are AML and CFT requirements mentioned in RBI master directions?",
+          "answer": "The RBI master directions require banks to have a **comprehensive AML/CFT policy** that:\n\n* is based on RBI guidelines and the Prevention of Money\u2011Laundering Act, 2002;  \n* incorporates the key elements of **Customer Acceptance Policy, Customer Identification Procedures, Risk Management and Monitoring of Transactions**;  \n* is reviewed **annually** and approved by the Board; and  \n* for branches or subsidiaries abroad, adopts the **more stringent** of RBI or host\u2011country KYC/AML/CFT standards, and notifies RBI if local laws prohibit implementation.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.9091,
+          "answer_relevancy": 0.8407,
+          "llm_context_precision_without_reference": 0.0
+        },
+        {
+          "id": "aml-002",
+          "question": "What customer due diligence steps are required under anti money laundering rules?",
+          "answer": "**Customer Due\u2011Diligence (CDD) steps required under India\u2019s anti\u2011money\u2011laundering (AML) rules (PML Act\u202f2002 & PML Rules\u202f2005)**  \n\n| Step | What it involves (as per the RBI and bank policy sources) |\n|------|-----------------------------------------------------------|\n| **1. Customer Identification** | Regulated Entities (REs) must collect and verify the customer\u2019s identity (name, address, ID documents, etc.) before any transaction or account opening. |\n| **2. Record\u2011Keeping** | All identification data, documents and due\u2011diligence records must be retained in a manner compliant with the PML Act and Rules. |\n| **3. Risk Assessment** | Each customer is assessed for money\u2011laundering risk (e.g., source of funds, transaction patterns, country of origin). |\n| **4. Enhanced Due Diligence (EDD)** | For high\u2011risk customers or transactions (e.g., >\u202f\u20b950\u202f000 or linked to high\u2011risk jurisdictions), REs must perform additional checks and monitoring. |\n| **5. Third\u2011Party Reliance (if used)** | REs may rely on a third\u2011party\u2019s CDD **only if**: <br>\u2022 the third party is regulated, supervised or monitored for compliance with PML CDD and record\u2011keeping; <br>\u2022 the third party is not based in a high\u2011risk jurisdiction; <br>\u2022 the RE obtains the third\u2011party\u2019s records immediately (or from the Central KYC Records Registry); <br>\u2022 the RE verifies copies of identification data and relevant documentation. |\n| **6. Transaction Monitoring** | All customer transactions are monitored for suspicious activity, with ongoing review of patterns and anomalies. |\n| **7. Reporting** | Suspicious or high\u2011risk transactions must be reported to the Financial Intelligence Unit (FIU) as required by the PML Act. |\n\nThese steps collectively form the core of the KYC/AML/CFT compliance framework mandated for all regulated entities in India.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.2,
+          "answer_relevancy": 0.9268,
+          "llm_context_precision_without_reference": 0.8333
+        },
+        {
+          "id": "lodr-001",
+          "question": "What corporate governance disclosures are required under SEBI listing obligations?",
+          "answer": "**Corporate\u2011governance disclosures required under SEBI listing obligations**\n\n| Disclosure | What it covers (SEBI requirement) | Key documents / sections |\n|------------|----------------------------------|--------------------------|\n| **Compliance Certificate** | Attestation that the company meets all mandatory corporate\u2011governance conditions in Schedule\u202fV of the SEBI Listing Regulations (sub\u2011paras\u202f2\u201110 of Part\u202fC). | Annexure\u202f4 \u2013 Compliance Certificate (e.g., issued by a practising Company Secretary). |\n| **Corporate\u2011Governance Report** | Detailed report on the company\u2019s governance structure, policies, and adherence to SEBI norms. | Corporate\u2011Governance Report annexed to the Integrated Annual Report. |\n| **Board Structure & Committees** | Disclosure of the board composition, committee memberships, and their functions. | Board\u2011structure section in the annual report (e.g., TCS report). |\n| **Policy Revisions** | Updates to key policies such as Materiality for Disclosure and Related\u2011Party Transactions to reflect SEBI amendments. | Disclosure section on policy revisions. |\n| **Management Discussion & Analysis (MD&A)** | Analysis of consolidated operations and governance in line with Regulation\u202f34 of the SEBI Listing Regulations. | MD&A section of the Integrated Annual Report. |\n| **Directors\u2019 Responsibility Statement** | Statement on internal controls, audit processes, and compliance with financial reporting standards. | Directors\u2019 Responsibility Statement in the report. |\n| **Secretarial Audit Report** | Report on the adequacy of secretarial compliance (Regulation\u202f24A). | Secretarial Audit Report. |\n| **Quarterly Compliance Report on Corporate Governance** | Periodic (quarterly) report on compliance with corporate\u2011governance provisions (Regulation\u202f27(2)). | Quarterly compliance report. |\n| **Integrated Reporting / Business Responsibility Report (BRR)** | Integrated reporting of environmental, governance, and stakeholder\u2011relationship metrics for top 500 listed entities (Regulation\u202f34(2)(f)). | BRR section of the Integrated Annual Report. |\n\nThese disclosures collectively satisfy the SEBI Listing Regulations\u2019 corporate\u2011governance obligations for listed companies.",
+          "generator_model": "openai/gpt-oss-20b",
+          "generation_failed": false,
+          "n_contexts": 5,
+          "faithfulness": 0.871,
+          "answer_relevancy": 0.9977,
+          "llm_context_precision_without_reference": 0.2
+        }
+      ]
+    }
+  }
+}
