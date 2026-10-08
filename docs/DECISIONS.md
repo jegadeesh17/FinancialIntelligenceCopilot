@@ -74,7 +74,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 **Context:** The service runs on GCP Cloud Run (`financial-copilot-api`, `asia-south1`), deployed by GitHub Actions. The index is large and gitignored; commit 62cc161 deleted a 91.5 MB index archive from the repo and blocked `*.zip`, `*.7z`, `*.tar.gz` and `*.gz` from future commits.
 **Decision:** CI does not build the index. The deploy workflow downloads release asset `chroma_db_linux.zip` from release `v0.1.0-data`, unzips it into `data/`, and bakes it (and the Hugging Face model) into the image (commits d2df6ed, 30db98d). Cloud Run runs with 2Gi memory, 1 CPU, min 0 / max 2 instances (DEPLOYMENT.md).
 **Alternatives rejected:** The earlier Streamlit Community Cloud setup, which extracted an LZMA-compressed index at startup (commit f1d6455), is superseded; the reason for the move is not recorded.
-**Consequences:** Updating the index is manual: rebuild locally, re-zip as `chroma_db_linux.zip`, replace the release asset, then redeploy. A push to `main` rebuilds and redeploys production (no path filter), so a docs-only merge also redeploys. Min instances is 0; no cold-start measurement is recorded.
+**Consequences:** Updating the index is manual: rebuild locally, re-zip as `chroma_db_linux.zip`, replace the release asset, then redeploy. A push to `main` rebuilds and redeploys production unless it only changes `docs/**` or `*.md` files (`paths-ignore`, see ADR-12), so a docs-only merge does not redeploy. Min instances is 0; no cold-start measurement is recorded.
 
 ---
 
@@ -99,6 +99,15 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 ## ADR-11: requirements.txt / requirements-dev.txt split
 
 **Context:** RAGAS and its LangChain dependencies are only needed for `scripts/eval_ragas.py`, and pytest only for tests.
-**Decision:** `requirements.txt` is runtime only. `requirements-dev.txt` starts with `-r requirements.txt` and adds pytest and RAGAS. CI installs `requirements-dev.txt`; the Docker image installs only `requirements.txt` so "the production image stays lean" (PHASE_LOG Phase 11, commit 117d3fb).
+**Decision:** `requirements.txt` is runtime only. `requirements-dev.txt` starts with `-r requirements.txt` and adds pytest and RAGAS. CI installs `requirements-dev.txt`; the Docker image installs `requirements.txt` (after a CPU-only PyTorch wheel, ADR-12) so "the production image stays lean" (PHASE_LOG Phase 11, commit 117d3fb).
 **Alternatives rejected:** None recorded (the previous single-file layout is implied but no comparison is recorded).
 **Consequences:** Local evaluation and tests need `pip install -r requirements-dev.txt`; the README quickstart notes this. The pinned RAGAS/LangChain set (ADR-09) stays out of the production image.
+
+---
+
+## ADR-12: CPU-only PyTorch, docs-only deploy skip and registry cleanup
+
+**Context:** The Cloud Run image was 3.56 GB, and every push to `main` redeployed production, including docs-only merges (ADR-08). Artifact Registry storage was the only cost driver in 30 days of measured usage (free tier 0.5 GB).
+**Decision:** (1) The Dockerfile installs CPU-only PyTorch (`--index-url https://download.pytorch.org/whl/cpu`) before `requirements.txt` (commit dc27597). (2) `deploy.yml` sets `paths-ignore: ["docs/**", "**.md"]` on push to `main`; `workflow_dispatch` still deploys (commit dc27597). (3) The Artifact Registry repository `ml-apis` (`asia-south1`) has a cleanup policy, configured in Google Cloud and not in this repo, that keeps the 2 newest image versions per service (current plus one rollback) and deletes older images about daily.
+**Alternatives rejected:** None recorded. The commit messages give no reason for either change.
+**Consequences:** The image is 0.74 GB instead of 3.56 GB. Docs-only pushes no longer deploy, so the next code push or a manual run deploys whatever is on `main`. Only the current and previous image versions are kept, so a rollback can only target one of them. Cloud Run settings are unchanged (2Gi, 1 CPU, min 0, max 2). Over 30 days Cloud Run used about 5% of the free-tier vCPU-seconds and about 2% of the free-tier GiB-seconds. GitHub Actions minutes are free because the repository is public.

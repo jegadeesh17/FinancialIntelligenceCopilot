@@ -199,7 +199,7 @@ Caveats:
 - The rate limit is in memory and per instance, so it is not shared across Cloud Run instances.
 - There is no authentication beyond the optional `API_KEY` header, and only `/ask` is protected.
 - Production runs the free-tier `openrouter/free` model, which is less reliable than the paid model used for evaluation.
-- A push to `main` redeploys Cloud Run (no path filter), so a docs-only merge also redeploys. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+- A push to `main` redeploys Cloud Run unless it only changes `docs/**` or `*.md` files (`paths-ignore` in `deploy.yml`), so a docs-only merge does not redeploy. Manual runs (`workflow_dispatch`) still deploy. See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 Possible improvements (not implemented): OCR for scanned PDFs, multi-collection routing, reference answers for Context Recall and answer-correctness scoring, a larger eval set, scheduled evaluation runs.
 

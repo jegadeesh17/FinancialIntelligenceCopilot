@@ -29,6 +29,9 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 - Removed the Streamlit UI; the FastAPI-served web UI is the only UI (`dbf2049`).
 - Split `requirements-dev.txt` (pytest, RAGAS) from `requirements.txt` so the production image stays lean (`117d3fb`).
 - Documentation refresh: standard README section order, docs index, changelog, commented `.env.example`, expanded `.gitignore`; corrected claims about the benchmark numbers, test counts, corpus, chunking, hybrid fusion, confidence flag, LLM failure behaviour and unused settings (Portkey, `HYBRID_ALPHA`, `LLM_PROVIDER`, `ENVIRONMENT`, `LOG_LEVEL`); moved `reports/evaluation.md` out of version control.
+- Docker image installs CPU-only PyTorch before `requirements.txt`, so the Cloud Run image is 0.74 GB instead of 3.56 GB (`dc27597`).
+- Deploy workflow skips pushes that only change `docs/**` or `*.md` files, so docs-only merges no longer redeploy Cloud Run (`dc27597`).
+- Artifact Registry cleanup policy for `ml-apis` keeps the two newest image versions per service (current and one rollback) and deletes older images automatically. The policy is set in Google Cloud, not in this repository.
 
 ### Fixed
 
@@ -38,3 +41,4 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 - Latency benchmark now warms up the model before timing and report claims were corrected (`3b3b083`).
 - Benchmark report prints the expected document instead of the question text and no longer cites a missing standards file (`f151916`).
 - Evaluation questions `aml-001`, `aml-002` and `lodr-001` now point at PDFs that are in the corpus (`5f6a39d`).
+- Answers are requested as plain text, so the web UI no longer shows Markdown asterisks and headings as literal characters (`618a4d6`).
