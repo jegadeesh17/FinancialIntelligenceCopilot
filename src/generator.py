@@ -46,7 +46,12 @@ def _call_openrouter(prompt: str, settings: Settings, model_slug: str) -> tuple[
     payload = {
         "model": model_slug,
         "messages": [
-            {"role": "system", "content": "You provide grounded answers from supplied context."},
+            {"role": "system", "content": (
+                    "You provide grounded answers from supplied context. "
+                    "Respond in plain text only: no Markdown, no asterisks, no headings. "
+                    "Use simple numbered lines or short paragraphs for structure."
+                ),
+            },
             {"role": "user", "content": prompt},
         ],
         "temperature": 0.2,
