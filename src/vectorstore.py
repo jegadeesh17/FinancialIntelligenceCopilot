@@ -10,7 +10,6 @@ from chromadb.api.models.Collection import Collection
 from src.config import Settings, get_settings
 from src.embeddings import embed_texts
 from src.indexing import write_index_metadata
-from src.ingest_docs import ingest_directory
 from src.schemas import DocumentChunk
 
 COLLECTION_NAME = "financial_compliance"
@@ -97,6 +96,8 @@ def build_vector_index(
     collection_name: str = COLLECTION_NAME,
 ) -> int:
     """Ingest PDFs from disk, embed chunks, and persist to ChromaDB."""
+    from src.ingest_docs import ingest_directory  # lazy: pymupdf is not in the API image
+
     settings = settings or get_settings()
     target_dir = pdf_dir or settings.raw_pdf_path
     chunks = ingest_directory(directory=target_dir, settings=settings)

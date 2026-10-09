@@ -11,3 +11,18 @@ models
 *.zip
 data/*.zip
 .venv
+
+# Not needed at runtime (API reads api/, src/, configs/, reports/*.json, data/chroma_db)
+data/raw_pdfs
+.github
+.claude
+docs
+scripts
+logs
+*.md
+reports/*.md
+docker-compose.yml
+requirements-dev.txt
+.env.*
+**/__pycache__
+**/*.pyc

@@ -61,7 +61,7 @@ class TestDependenciesImportable:
         [
             "fitz",
             "chromadb",
-            "sentence_transformers",
+            "onnxruntime",
         ],
     )
     def test_rag_package_importable(self, module_name: str):

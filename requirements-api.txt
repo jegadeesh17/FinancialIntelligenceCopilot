@@ -1,0 +1,10 @@
+# Runtime dependencies for the Cloud Run API image (see Dockerfile).
+# Excludes ingestion-only packages (pymupdf); use requirements.txt for dev / index builds.
+python-dotenv>=1.0.1
+pydantic>=2.10.3
+pydantic-settings>=2.6.1
+chromadb>=1.5.9
+httpx>=0.28.1
+rank-bm25>=0.2.2
+fastapi>=0.115.6
+uvicorn>=0.32.1

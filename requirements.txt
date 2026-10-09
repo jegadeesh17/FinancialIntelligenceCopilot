@@ -6,8 +6,7 @@ pydantic-settings>=2.6.1
 # Phase 2 — document ingestion
 pymupdf>=1.25.1
 
-# Phase 3 — embeddings & vector store
-sentence-transformers>=3.3.1
+# Phase 3 — embeddings & vector store (ONNX MiniLM ships with chromadb; no torch)
 chromadb>=1.5.9
 
 # Phase 5 — LLM generation
