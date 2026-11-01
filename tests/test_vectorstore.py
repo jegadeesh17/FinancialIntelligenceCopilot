@@ -1,8 +1,8 @@
 """
-Phase 3 checkpoint tests — Embeddings & Vector Store.
+Embeddings & Vector Store tests.
 
-Run: pytest tests/test_phase3_vectorstore.py -v
-Integration (full corpus): pytest tests/test_phase3_vectorstore.py -m integration -v
+Run: pytest tests/test_vectorstore.py -v
+Integration (full corpus): pytest tests/test_vectorstore.py -m integration -v
 """
 
 import importlib
