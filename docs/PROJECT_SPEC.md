@@ -12,7 +12,7 @@
 | **Last updated** | 2026-10-03 |
 | **Repository** | [github.com/jegadeesh17/FinancialIntelligenceCopilot](https://github.com/jegadeesh17/FinancialIntelligenceCopilot) |
 | **Project folder** | `FinancialIntelligenceCopilot` |
-| **Related docs** | [README.md](../README.md), [PHASE_LOG.md](./PHASE_LOG.md), [DEPLOYMENT.md](./DEPLOYMENT.md), [API.md](./API.md), [EVALUATIONS.md](./EVALUATIONS.md), [DECISIONS.md](./DECISIONS.md) |
+| **Related docs** | [README.md](../README.md), [DEPLOYMENT.md](./DEPLOYMENT.md), [API.md](./API.md), [EVALUATIONS.md](./EVALUATIONS.md), [DECISIONS.md](./DECISIONS.md) |
 
 ---
 
@@ -37,7 +37,7 @@ The system ingests PDFs, embeds chunks into ChromaDB, retrieves relevant passage
 | 5 | OpenRouter LLM generation with strict context-only prompting |
 | 6 | Web chat UI (`api/index.html`, served by FastAPI) with citation display (doc name + page); replaced the earlier Streamlit UI |
 | 7 | Docker containerization |
-| 8 | Per-phase pytest checkpoint tests |
+| 8 | Per-area pytest checkpoint tests |
 | 9 | Corpus mix by document category (regulatory, annual report, insurance, exam reference) in `GET /health` |
 | 10 | Low-confidence flag (`low_confidence`, `best_score`) returned by `/ask` and shown in the UI |
 | 11 | Hybrid BM25 + vector search via Reciprocal Rank Fusion (enabled by default) |
@@ -124,7 +124,6 @@ User Question ──▶ Retriever ──┘   (dense vectors; BM25 re-ranks the 
 | Backend | `src/*.py` | Production logic; unit-tested |
 | UI | `api/index.html` | Static web chat with citations, served by FastAPI at `/app` |
 | Spec | `docs/PROJECT_SPEC.md` | This document |
-| Learning log | `docs/PHASE_LOG.md` | Per-phase notes |
 
 ### 4.3 Data Flow
 
@@ -222,23 +221,23 @@ Full eval set: `data/eval_questions.json`; methodology in [EVALUATIONS.md](./EVA
 
 ## 7. Implementation Roadmap
 
-**Gate rule:** Do not start phase *N+1* until phase *N* checkpoint tests pass.
+**Gate rule:** Do not start the next area until the previous area's checkpoint tests pass.
 
-| Phase | Name | Status | Checkpoint |
-|-------|------|--------|------------|
-| **0** | Scaffold & Spec | ✅ Complete | `pytest tests/test_phase0_scaffold.py -v` |
-| **1** | Project Setup & MLOps | ✅ Complete | `pytest tests/test_phase1_setup.py -v` |
-| **2** | Document Ingestion | ✅ Complete | `pytest tests/test_phase2_ingest.py -v` |
-| **3** | Embeddings & Vector Store | ✅ Complete | `pytest tests/test_phase3_vectorstore.py -v` |
-| **4** | Retrieval System | ✅ Complete | `pytest tests/test_phase4_retriever.py -v` |
-| **5** | LLM Generator | ✅ Complete | `pytest tests/test_phase5_generator.py -v` |
-| **6** | Chat UI (Streamlit; later replaced by the FastAPI-served web UI) | ✅ Complete | `pytest tests/test_api.py -v` |
-| **7** | Containerization (Docker) | ✅ Complete | `pytest tests/test_phase7_docker.py -v` |
-| **8** | Corpus Ops | ✅ Complete | `python scripts/build_index.py` |
-| **9** | Confidence Gate + Metadata Propagation | ✅ Complete | `pytest tests/test_phase2_ingest.py tests/test_phase4_retriever.py tests/test_api.py -q` |
-| **10** | Hardening, Resume Unification, Cleanup | ✅ Complete | `pytest -q` |
-| **11** | Evaluation, Hybrid Default, Cleanup | ✅ Complete | `pytest -q` |
-| **12** | Evaluation Fixes and Documentation | ✅ Complete | `pytest -q` |
+| Area | Status | Checkpoint |
+|------|--------|------------|
+| Scaffold & Spec | ✅ Complete | `pytest tests/test_project_structure.py -v` |
+| Project Setup & MLOps | ✅ Complete | `pytest tests/test_project_setup.py -v` |
+| Document Ingestion | ✅ Complete | `pytest tests/test_ingest.py -v` |
+| Embeddings & Vector Store | ✅ Complete | `pytest tests/test_vectorstore.py -v` |
+| Retrieval System | ✅ Complete | `pytest tests/test_retriever.py -v` |
+| LLM Generator | ✅ Complete | `pytest tests/test_generator.py -v` |
+| Chat UI (Streamlit; later replaced by the FastAPI-served web UI) | ✅ Complete | `pytest tests/test_api.py -v` |
+| Containerization (Docker) | ✅ Complete | `pytest tests/test_docker.py -v` |
+| Corpus Ops | ✅ Complete | `python scripts/build_index.py` |
+| Confidence Gate + Metadata Propagation | ✅ Complete | `pytest tests/test_ingest.py tests/test_retriever.py tests/test_api.py -q` |
+| Hardening, Resume Unification, Cleanup | ✅ Complete | `pytest -q` |
+| Evaluation, Hybrid Default, Cleanup | ✅ Complete | `pytest -q` |
+| Evaluation Fixes and Documentation | ✅ Complete | `pytest -q` |
 
 **Status legend:** ✅ Complete
 
@@ -274,7 +273,6 @@ FinancialIntelligenceCopilot/
 ├── data/eval_questions.json    # evaluation question set
 ├── docs/
 │   ├── PROJECT_SPEC.md
-│   ├── PHASE_LOG.md
 │   ├── DEPLOYMENT.md
 │   ├── API.md
 │   ├── EVALUATIONS.md
@@ -301,7 +299,7 @@ FinancialIntelligenceCopilot/
 │   ├── rag_pipeline.py
 │   ├── corpus_stats.py
 │   └── telemetry.py
-├── tests/                      # test_phaseN_*.py, test_api.py and others
+├── tests/                      # unit and integration tests
 ├── docker-compose.yml
 ├── Dockerfile
 ├── .env.example
@@ -321,15 +319,15 @@ FinancialIntelligenceCopilot/
 |------|---------|--------|
 | 2026-07-07 | 1.0 | Spec finalized; scaffold pushed to GitHub |
 | 2026-07-07 | 1.1 | Initial PDFs updated to RBI + HDFC + SEBI |
-| 2026-07-07 | 1.2 | Phase 1 complete — config, setup tests, data source guide |
-| 2026-07-07 | 1.3 | Phase 2 complete — ingest pipeline and download script |
-| 2026-07-07 | 1.4 | Phase 3 complete — embeddings, vectorstore, and ChromaDB persistence |
-| 2026-07-07 | 1.5 | Phase 4 complete — retriever module and top-k semantic search tests |
-| 2026-07-07 | 1.6 | Phase 5 complete — OpenRouter generator, citations, and checkpoint tests |
-| 2026-07-07 | 1.7 | Phase 6 complete — rag_pipeline, chat helpers, Streamlit chat UI, UI tests |
-| 2026-07-07 | 1.8 | Phase 7 complete — Dockerfile, compose stack, and containerization tests |
+| 2026-07-07 | 1.2 | Config, setup tests, data source guide |
+| 2026-07-07 | 1.3 | Ingest pipeline and download script |
+| 2026-07-07 | 1.4 | Embeddings, vectorstore, and ChromaDB persistence |
+| 2026-07-07 | 1.5 | Retriever module and top-k semantic search tests |
+| 2026-07-07 | 1.6 | OpenRouter generator, citations, and checkpoint tests |
+| 2026-07-07 | 1.7 | Rag_pipeline, chat helpers, Streamlit chat UI, UI tests |
+| 2026-07-07 | 1.8 | Dockerfile, compose stack, and containerization tests |
 | 2026-07-09 | 2.0 | Added dual-vertical architecture, scraping ops scripts, confidence gate, metadata propagation, and corpus coverage surfaces |
 | 2026-10-03 | 2.1 | RAGAS evaluation added, Streamlit UI removed, dev/prod requirements split, `GET /eval` + web UI Eval metrics popover |
 | 2026-10-03 | 2.2 | Docs refresh: LICENSE, DEPLOYMENT.md, API.md, manifest and env sync |
 | 2026-10-03 | 2.3 | Eval set and benchmark report fixed, evals re-run, EVALUATIONS.md and DECISIONS.md added |
-| 2026-10-03 | 2.4 | Documentation refresh: corrected scope wording, FR-14, phase list and unused-setting notes to match the code |
+| 2026-10-03 | 2.4 | Documentation refresh: corrected scope wording, FR-14, area list and unused-setting notes to match the code |

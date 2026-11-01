@@ -1,19 +1,19 @@
-# Phase 1 — core
+# Core
 python-dotenv>=1.0.1
 pydantic>=2.10.3
 pydantic-settings>=2.6.1
 
-# Phase 2 — document ingestion
+# Document ingestion
 pymupdf>=1.25.1
 
-# Phase 3 — embeddings & vector store (ONNX MiniLM ships with chromadb; no torch)
+# Embeddings & vector store (ONNX MiniLM ships with chromadb; no torch)
 chromadb>=1.5.9
 
-# Phase 5 — LLM generation
+# LLM generation
 httpx>=0.28.1
 beautifulsoup4
 
-# Phase 4 — hybrid BM25 + dense retrieval (Reciprocal Rank Fusion)
+# Hybrid BM25 + dense retrieval (Reciprocal Rank Fusion)
 rank-bm25>=0.2.2
 
 # Portfolio API layer

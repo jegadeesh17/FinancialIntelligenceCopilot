@@ -1,8 +1,8 @@
 # Architecture Decisions — Financial Intelligence Copilot
 
-> Lightweight architecture decision records (ADRs). Per-phase notes are in [PHASE_LOG.md](./PHASE_LOG.md); the full specification is in [PROJECT_SPEC.md](./PROJECT_SPEC.md).
+> Lightweight architecture decision records (ADRs). The full specification is in [PROJECT_SPEC.md](./PROJECT_SPEC.md).
 
-Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEPLOYMENT, README, commit messages). Where no reason was recorded, the entry says so and lists only the observable trade-off.
+Rationale here is taken only from recorded sources (PROJECT_SPEC, DEPLOYMENT, README, commit messages). Where no reason was recorded, the entry says so and lists only the observable trade-off.
 
 ---
 
@@ -18,7 +18,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 ## ADR-02: MiniLM CPU embeddings (all-MiniLM-L6-v2)
 
 **Context:** Embeddings are computed locally. NFR-03 requires that they run on CPU so the project works on 4GB VRAM laptops.
-**Decision:** Use `sentence-transformers/all-MiniLM-L6-v2` on CPU (384-dimensional vectors), locked in the Scaffold phase. The Docker image bakes the model in (commit d2df6ed).
+**Decision:** Use the `all-MiniLM-L6-v2` model on CPU (384-dimensional vectors) through Chroma's bundled ONNX runtime, so no torch dependency is needed; chosen at project setup. The Docker image bakes the model in (commit d2df6ed).
 **Alternatives rejected:** None recorded.
 **Consequences:** No GPU is needed and no embedding API is called. Model load time is real: latency benchmarking needed a warm-up call so model load is not counted (commit 3b3b083). The same local MiniLM embeddings are reused by the RAGAS evaluation (ADR-09).
 
@@ -27,7 +27,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 ## ADR-03: ChromaDB persistent store
 
 **Context:** Chunk vectors and metadata (`source`, `page`, and later `retrieved_at`, `regulator` and `document_category`; `src/ingest_docs.py`, `src/retriever.py:96-113`) must survive between runs and be queryable by the retriever.
-**Decision:** Use ChromaDB as a persistent local store (`data/chroma_db/`), locked in the Scaffold phase. Upserts are batched to respect Chroma's maximum batch size (PHASE_LOG, Phase 3).
+**Decision:** Use ChromaDB as a persistent local store (`data/chroma_db/`), chosen at project setup. Upserts are batched to respect Chroma's maximum batch size.
 **Alternatives rejected:** None recorded. No reason for choosing ChromaDB over other vector stores is recorded.
 **Consequences:** The index is a directory of files, gitignored, so it must be rebuilt (`python scripts/build_index.py`) or shipped separately; see ADR-08. `chromadb>=1.5.9` is pinned in `requirements.txt`.
 
@@ -53,7 +53,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 
 ## ADR-06: Low-confidence distance gate 0.85
 
-**Context:** In regulated finance a weak retrieval should not look like a confident answer. PHASE_LOG Phase 9: "when retrieval quality is weak, communicate uncertainty explicitly".
+**Context:** In regulated finance a weak retrieval should not look like a confident answer. The design goal recorded in the project spec: when retrieval quality is weak, communicate uncertainty explicitly.
 **Decision:** Flag retrieval as low confidence when the best distance exceeds `LOW_CONFIDENCE_DISTANCE` (default 0.85). `low_confidence` and `best_score` are returned through the pipeline, `/ask`, and the web UI (FR-11, FR-12).
 **Alternatives rejected:** None recorded. No reason is recorded for the value 0.85.
 **Consequences:** The gate flags weak retrieval (FR-11 says "flag"); it is a distance threshold on retrieval only and does not check the generated answer. The threshold is configurable by env var.
@@ -62,10 +62,10 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 
 ## ADR-07: Static web UI on FastAPI replacing Streamlit
 
-**Context:** The project first shipped a Streamlit chat UI (Phase 6) and later added a static web UI at `/app` served by FastAPI (commit 2ccac45). Both existed for a time, with Streamlit as an opt-in compose service (commit 558e0dc).
+**Context:** The project first shipped a Streamlit chat UI and later added a static web UI at `/app` served by FastAPI (commit 2ccac45). Both existed for a time, with Streamlit as an opt-in compose service (commit 558e0dc).
 **Decision:** Remove the Streamlit UI (`app/`, `src/chat.py`, `src/ui_styles.py`, the Streamlit tests, the compose service). `api/index.html`, served by FastAPI, is the only UI (commit dbf2049, marked `refactor!`).
 **Alternatives rejected:** Streamlit (removed). The commit records what was removed, not why.
-**Consequences:** One UI and one runtime (uvicorn) to maintain. Streamlit-based `AppTest` coverage is gone; the Phase 6 checkpoint now points at `pytest tests/test_api.py`. Anyone relying on `streamlit run app/app.py` loses that entry point.
+**Consequences:** One UI and one runtime (uvicorn) to maintain. Streamlit-based `AppTest` coverage is gone; the UI checkpoint now points at `pytest tests/test_api.py`. Anyone relying on `streamlit run app/app.py` loses that entry point.
 
 ---
 
@@ -91,7 +91,7 @@ Rationale here is taken only from recorded sources (PHASE_LOG, PROJECT_SPEC, DEP
 
 **Context:** The first RAGAS runs used the free `openrouter/free` generator (the production default per PROJECT_SPEC section 5).
 **Decision:** Evaluate with one fixed paid model, `openai/gpt-oss-20b` (paid endpoint, no fallbacks), so every run uses the same generator.
-**Alternatives rejected:** The free tier `openrouter/free`: 1/10 (dense) and 5/10 (hybrid) answers were generation failures scored 0.0, so those runs are not reported (PHASE_LOG Phase 11; README caveats).
+**Alternatives rejected:** The free tier `openrouter/free`: 1/10 (dense) and 5/10 (hybrid) answers were generation failures scored 0.0, so those runs are not reported (README caveats).
 **Consequences:** The reported RAGAS numbers describe `openai/gpt-oss-20b`, not the model production uses by default, and evaluation runs incur OpenRouter cost. The README reports 0 NaN scores and 0 generation failures for the final runs.
 
 ---
