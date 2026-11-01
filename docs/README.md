@@ -13,4 +13,3 @@ Tracked documents for Financial Intelligence Copilot. The root [README.md](../RE
 | [DECISIONS.md](DECISIONS.md) | Architecture decision records with commit evidence | Hand-written | A design decision is made or revised |
 | [DATA_SOURCES.md](DATA_SOURCES.md) | The 12-PDF corpus and how to obtain it | Hand-written | The corpus changes |
 | [DEMO.md](DEMO.md) | Five-minute demo flow | Hand-written | The UI or demo questions change |
-| [PHASE_LOG.md](PHASE_LOG.md) | Historical per-phase build notes (Streamlit commands no longer apply) | Hand-written, append-only | A phase is completed |

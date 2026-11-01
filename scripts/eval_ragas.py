@@ -58,7 +58,7 @@ METRIC_LABELS = {
 
 
 class MiniLMRagasEmbeddings(BaseRagasEmbeddings):
-    """Expose the project's sentence-transformers MiniLM model to RAGAS."""
+    """Expose the project's ONNX MiniLM embeddings to RAGAS."""
 
     def embed_query(self, text: str) -> list[float]:
         return embed_query(text)

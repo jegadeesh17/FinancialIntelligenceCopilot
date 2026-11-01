@@ -81,7 +81,7 @@ Definitions (top-k = 5):
 
 The RAGAS runs use `OPENROUTER_MODEL=openai/gpt-oss-20b` with no fallbacks. **Production does not.** The deploy workflow sets only `OPENROUTER_API_KEY` on Cloud Run, so production uses the default `openrouter/free`.
 
-The free tier was rejected for evaluation because of generation failures: in the first attempt, 1/10 dense and 5/10 hybrid answers failed (PHASE_LOG, Phase 11). Those runs were not reported.
+The free tier was rejected for evaluation because of generation failures: in the first attempt, 1/10 dense and 5/10 hybrid answers failed. Those runs were not reported.
 
 So the RAGAS scores describe **this pipeline with `gpt-oss-20b`**, not the live free-tier model. Retrieval numbers (layer 1) do not depend on the generator and apply to production.
 

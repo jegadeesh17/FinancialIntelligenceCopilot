@@ -152,7 +152,7 @@ FinancialIntelligenceCopilot/
 
 **Corpus (12 PDFs):** 5 annual reports (HDFC Bank, ICICI Bank, Reliance, Tata Consumer Products, TCS), 4 RBI/SEBI regulatory documents, 2 IRDAI circulars and the NISM Series XV Research Analyst workbook. File list and sources: [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md).
 
-**Build phases (0 to 12):** Scaffold & Spec; Project Setup & MLOps; Document Ingestion; Embeddings & Vector Store; Retrieval System; LLM Generator; Chat UI (Streamlit, since replaced by the FastAPI-served web UI); Containerization; Corpus Ops; Confidence Gate + Metadata Propagation; Hardening, Resume Unification, Cleanup; Evaluation, Hybrid Default, Cleanup; Evaluation Fixes and Documentation. Details: [docs/PHASE_LOG.md](docs/PHASE_LOG.md).
+**Built in stages:** Scaffold & Spec; Project Setup & MLOps; Document Ingestion; Embeddings & Vector Store; Retrieval System; LLM Generator; Chat UI (Streamlit, since replaced by the FastAPI-served web UI); Containerization; Corpus Ops; Confidence Gate + Metadata Propagation; Hardening, Resume Unification, Cleanup; Evaluation, Hybrid Default, Cleanup; Evaluation Fixes and Documentation.
 
 ## Evaluation
 
@@ -209,6 +209,10 @@ Possible improvements (not implemented): OCR for scanned PDFs, multi-collection 
 - [docs/DECISIONS.md](docs/DECISIONS.md): architecture decision records
 - [CHANGELOG.md](CHANGELOG.md): what changed
 - [docs/PROJECT_SPEC.md](docs/PROJECT_SPEC.md), [docs/API.md](docs/API.md), [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md), [docs/EVALUATIONS.md](docs/EVALUATIONS.md)
+
+## How this was built
+
+Designed and built by jegadeesh17 with Claude Code. I reviewed and tested all code.
 
 ## License
 
