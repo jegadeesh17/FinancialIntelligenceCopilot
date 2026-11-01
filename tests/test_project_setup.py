@@ -1,7 +1,7 @@
 """
-Phase 1 checkpoint tests — Project Setup & MLOps Foundation.
+Project Setup & MLOps Foundation tests.
 
-Run: pytest tests/test_phase1_setup.py -v
+Run: pytest tests/test_project_setup.py -v
 """
 
 import importlib
@@ -20,7 +20,7 @@ def project_root() -> Path:
 
 
 class TestProjectStructure:
-    """Verify Phase 1 scaffold and config files exist."""
+    """Verify the scaffold and config files exist."""
 
     @pytest.mark.parametrize(
         "relative_path",

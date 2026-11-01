@@ -1,8 +1,8 @@
 """
-Phase 4 checkpoint tests — Retrieval System.
+Retrieval System tests.
 
-Run: pytest tests/test_phase4_retriever.py -v
-Integration: pytest tests/test_phase4_retriever.py -m integration -v
+Run: pytest tests/test_retriever.py -v
+Integration: pytest tests/test_retriever.py -m integration -v
 """
 
 import importlib

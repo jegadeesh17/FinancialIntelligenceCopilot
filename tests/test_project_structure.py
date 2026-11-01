@@ -1,7 +1,7 @@
 """
-Scaffold checkpoint — verifies project structure before Phase 1.
+Project structure checks: required files and directories exist.
 
-Run: pytest tests/test_phase0_scaffold.py -v
+Run: pytest tests/test_project_structure.py -v
 """
 
 from pathlib import Path
@@ -23,7 +23,7 @@ class TestScaffoldStructure:
         "relative_path",
         [
             "docs/PROJECT_SPEC.md",
-            "docs/PHASE_LOG.md",
+            "docs/DECISIONS.md",
             "notebooks/FinancialIntelligenceCopilot.ipynb",
             "requirements.txt",
             ".env.example",

@@ -1,7 +1,7 @@
 """
-Phase 7 checkpoint tests — Docker containerization.
+Docker containerization tests.
 
-Run: pytest tests/test_phase7_docker.py -v
+Run: pytest tests/test_docker.py -v
 """
 
 import shutil

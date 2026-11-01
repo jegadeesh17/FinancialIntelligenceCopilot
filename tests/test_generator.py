@@ -1,8 +1,8 @@
 """
-Phase 5 checkpoint tests — LLM Generator.
+LLM Generator tests.
 
-Run: pytest tests/test_phase5_generator.py -v
-Integration: pytest tests/test_phase5_generator.py -m integration -v
+Run: pytest tests/test_generator.py -v
+Integration: pytest tests/test_generator.py -m integration -v
 """
 
 import importlib

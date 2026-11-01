@@ -1,8 +1,8 @@
 """
-Phase 2 checkpoint tests — Document Ingestion.
+Document Ingestion tests.
 
-Run: pytest tests/test_phase2_ingest.py -v
-Integration (real PDFs): pytest tests/test_phase2_ingest.py -m integration -v
+Run: pytest tests/test_ingest.py -v
+Integration (real PDFs): pytest tests/test_ingest.py -m integration -v
 """
 
 import importlib
